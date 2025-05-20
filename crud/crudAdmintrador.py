@@ -5,21 +5,8 @@ from .database import db
 from .crudEmpleado import Empleado
 from typing import Optional
 from typing import Tuple, List
-from api.main import EmpleadoUpdate
+from api.schemas import EmpleadoResponse
 
-class EmpleadoResponse(EmpleadoUpdate):  # Hereda de EmpleadoUpdate
-    id_empleado: int
-    nombre: str
-    apellido: str
-    tipo_identificacion: str
-    numero_identificacion: str
-    fecha_nacimiento: str  # Ajusta el tipo si es date
-    genero: Optional[str] = None
-    pais_nacimiento: Optional[str] = None
-    estado_civil: Optional[str] = None
-
-    class Config:
-        from_attributes = True
 
 class AdminCRUD:
     @staticmethod

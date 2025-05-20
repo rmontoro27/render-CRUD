@@ -15,7 +15,7 @@ from crud.crudEmpleado import Empleado
 from pydantic import BaseModel
 from typing import List
 from typing import Tuple, List
-from crud.crudAdmintrador import EmpleadoResponse
+from .schemas import EmpleadoResponse
 
 
 # Dato biometrico, lo voy a usar para probar el endpoint regitrar horario
