@@ -54,7 +54,7 @@ class AsistenciaManual(BaseModel):
 
 app = FastAPI()
 
-@app.post("/empleados/")
+@app.post("/empleados/", response_model=EmpleadoResponse)
 def crear_empleado(empleado: Empleado):
     try:
         empleado = AdminCRUD.crear_empleado(empleado)
