@@ -195,7 +195,7 @@ def buscar_empleados(
     apellido: Optional[str] = None,
     dni: Optional[str] = None
 ):
-    empleados = Empleado.buscar_avanzado(
+    empleados = AdminCRUD.buscar_avanzado(
         nombre=nombre,
         apellido=apellido,
         dni=dni
