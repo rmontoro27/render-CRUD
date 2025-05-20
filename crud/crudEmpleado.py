@@ -61,7 +61,7 @@ class Empleado:
             with db.conn.cursor() as cur:
                 cur.execute(
                     """
-                    INSERT INTO empleados (id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
+                    INSERT INTO empleado (id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                     fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, localidad, partido, provincia, 
                     genero, pais_nacimiento, estado_civil)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -102,7 +102,7 @@ class Empleado:
                 SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                     fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, 
                     localidad, partido, provincia, genero, pais_nacimiento, estado_civil
-                FROM empleados
+                FROM empleado
                 WHERE id_empleado = %s
                 """,
                 (str(id_empleado),)
@@ -138,7 +138,7 @@ class Empleado:
                 SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                     fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, 
                     localidad, partido, provincia, genero, pais_nacimiento, estado_civil
-                FROM empleados
+                FROM empleado
                 WHERE numero_identificacion = %s
                 """,
                 (numero_identificacion,)
