@@ -16,6 +16,9 @@ from pydantic import BaseModel
 from typing import List
 from typing import Tuple, List
 from .schemas import EmpleadoResponse
+from .schemas import EmpleadoUpdate
+
+
 
 
 # Dato biometrico, lo voy a usar para probar el endpoint regitrar horario
@@ -38,31 +41,9 @@ from .schemas import EmpleadoResponse
     #return vector_neutro
 
 
-class Empleado(BaseModel):
-    nombre: str
-    apellido: str
-    tipo_identificacion: str
-    numero_identificacion: str
-    fecha_nacimiento: str
-    correo_electronico: str
-    telefono: str
-    calle: str
-    numero_calle: int
-    localidad: str
-    partido: str
-    provincia: str
-    genero: str
-    pais_nacimiento: str
-    estado_civil: str
 
-class EmpleadoUpdate(BaseModel):
-    telefono: Optional[str] = None
-    correo_electronico: Optional[str] = None
-    calle: Optional[str] = None
-    numero_calle: Optional[str] = None
-    localidad: Optional[str] = None
-    partido: Optional[str] = None  # Nueva variable agregada
-    provincia: Optional[str] = None
+
+
 
 class AsistenciaManual(BaseModel):
     id_empleado: int
