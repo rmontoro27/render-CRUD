@@ -51,7 +51,7 @@ class AdminCRUD:
             raise Exception(f"Error al crear empleado: {e}")
 
     @staticmethod
-    def obtener_empleados():
+    def obtener_empleado():
         """Lista todos los empleados con información básica"""
         with db.conn.cursor() as cur:
             cur.execute(
@@ -242,12 +242,12 @@ class AdminCRUD:
                SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                    fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, 
                    localidad, partido, provincia, genero, nacionalidad, estado_civil
-               FROM empleados
+               FROM empleado
                WHERE 1=1
            """
 
         # Query para contar el total  ( número total de registros que coinciden con los filtros de búsqueda)
-        count_query = "SELECT COUNT(*) FROM empleados WHERE 1=1"
+        count_query = "SELECT COUNT(*) FROM empleado WHERE 1=1"
 
         params = []
 
