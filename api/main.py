@@ -15,6 +15,7 @@ from crud.crudEmpleado import Empleado
 from pydantic import BaseModel
 from typing import List
 from typing import Tuple, List
+from crud.crudAdmintrador import EmpleadoResponse
 
 
 # Dato biometrico, lo voy a usar para probar el endpoint regitrar horario
@@ -190,7 +191,7 @@ def listar_empleados():
         raise HTTPException(status_code=400, detail=str(e))
 
 # Búsqueda avanzada de empleados
-@app.get("/empleados/buscar/", response_model=Tuple[List[Dict], int])  # <- Cambiado a Tuple
+@app.get("/empleados/buscar/", response_model=Tuple[List[EmpleadoResponse], int])  # <- Cambiado a Tuple
 def buscar_empleados(
     nombre: Optional[str] = None,
     apellido: Optional[str] = None,
@@ -198,7 +199,4 @@ def buscar_empleados(
     pagina: int = 1,
     por_pagina: int = 10
 ):
-    empleados, total = AdminCRUD.buscar_avanzado(nombre, apellido, dni, pagina, por_pagina)
-    # Convertir objetos Empleado a dicts
-    empleados_dict = [empleado.__dict__ for empleado in empleados]
-    return empleados_dict, total  # Ahora coincide con Tuple[List[Dict], int]
+    return AdminCRUD.buscar_avanzado(nombre, apellido, dni, pagina, por_pagina)

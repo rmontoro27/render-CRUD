@@ -5,7 +5,21 @@ from .database import db
 from .crudEmpleado import Empleado
 from typing import Optional
 from typing import Tuple, List
+from api.main import EmpleadoUpdate
 
+class EmpleadoResponse(EmpleadoUpdate):  # Hereda de EmpleadoUpdate
+    id_empleado: int
+    nombre: str
+    apellido: str
+    tipo_identificacion: str
+    numero_identificacion: str
+    fecha_nacimiento: str  # Ajusta el tipo si es date
+    genero: Optional[str] = None
+    pais_nacimiento: Optional[str] = None
+    estado_civil: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 class AdminCRUD:
     @staticmethod
@@ -235,7 +249,7 @@ class AdminCRUD:
             dni: Optional[str] = None,
             pagina: int = 1,
             por_pagina: int = 10
-    ) -> Tuple[List['Empleado'], int]:
+    ) -> Tuple[List[EmpleadoResponse], int]:
         """Versión con paginación"""
         # Query principal
         base_query = """
@@ -286,7 +300,7 @@ class AdminCRUD:
 
             # Cada fila de la base de datos (result) se convierte en un objeto Empleado, psycopg2 devuelve filas como tuplas
             empleados = [
-                Empleado(
+                EmpleadoResponse(
                     id_empleado=row[0],
                     nombre=row[1],
                     apellido=row[2],
