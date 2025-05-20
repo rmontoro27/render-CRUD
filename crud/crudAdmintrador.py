@@ -2,7 +2,7 @@ from datetime import datetime, date, time
 import psycopg2
 from psycopg2 import sql
 from .database import db
-from crudEmpleado import Empleado
+from .crudEmpleado import Empleado
 from typing import Optional
 from typing import Tuple, List
 
