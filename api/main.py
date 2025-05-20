@@ -15,8 +15,7 @@ from crud.crudEmpleado import Empleado
 from pydantic import BaseModel
 from typing import List
 from typing import Tuple, List
-from .schemas import EmpleadoResponse
-from .schemas import EmpleadoUpdate
+from .schemas import EmpleadoResponse, EmpleadoBase, EmpleadoUpdate
 
 
 
@@ -55,9 +54,9 @@ class AsistenciaManual(BaseModel):
 app = FastAPI()
 
 @app.post("/empleados/", response_model=EmpleadoResponse)
-def crear_empleado(empleado: Empleado):
+def crear_empleado(empleado: EmpleadoBase):
     try:
-        empleado = AdminCRUD.crear_empleado(empleado)
+        empleado_creado = AdminCRUD.crear_empleado(empleado)
         return {
             "nombre": empleado.nombre,
             "apellido": empleado.apellido,
