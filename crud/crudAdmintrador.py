@@ -103,7 +103,7 @@ class AdminCRUD:
                     "localidad": result[10],
                     "partido": result[11],
                     "genero": result[12],
-                    "nacionalidad": result[13],
+                    "pais_nacimiento": result[13],
                     "estado_civil": result[14]
                 }
             return None
@@ -241,7 +241,7 @@ class AdminCRUD:
         base_query = """
                SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                    fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, 
-                   localidad, partido, provincia, genero, nacionalidad, estado_civil
+                   localidad, partido, provincia, genero, pais_nacimiento, estado_civil
                FROM empleado
                WHERE 1=1
            """
@@ -301,7 +301,7 @@ class AdminCRUD:
                     partido=row[11],
                     provincia=row[12],
                     genero=row[13],
-                    nacionalidad=row[14],
+                    pais_nacimiento=row[14],
                     estado_civil=row[15]
                 )
                 for row in results

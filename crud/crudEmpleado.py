@@ -7,7 +7,7 @@ class Empleado:
     def __init__(self, id_empleado=None, nombre=None, apellido=None, tipo_identificacion=None,
                  numero_identificacion=None, fecha_nacimiento=None, correo_electronico=None,
                  telefono=None, calle=None, numero_calle=None, localidad=None, partido=None, provincia=None,
-                 genero=None, nacionalidad=None, estado_civil=None):
+                 genero=None, pais_nacimiento=None, estado_civil=None):
 
         # Validar provincia
         provincias_validas = ['Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
@@ -22,7 +22,7 @@ class Empleado:
         # Validar nacionalidad
         nacionalidades_validas = ['Argentina', 'Brasil', 'Chile', 'Uruguay', 'Paraguay',
                                   'Bolivia', 'Perú', 'Ecuador', 'Colombia', 'Venezuela', 'México']
-        if nacionalidad and nacionalidad not in nacionalidades_validas:
+        if pais_nacimiento and pais_nacimiento not in nacionalidades_validas:
             raise ValueError(f"Nacionalidad inválida. Opciones válidas: {nacionalidades_validas}")
 
         # Validar tipo_identificacion
@@ -49,13 +49,13 @@ class Empleado:
         self.partido = partido
         self.provincia = provincia
         self.genero = genero
-        self.nacionalidad = nacionalidad
+        self.pais_nacimiento = pais_nacimiento
         self.estado_civil = estado_civil
 
     @staticmethod
     def crear(id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion,
             fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, localidad,
-            partido, provincia, genero, nacionalidad, estado_civil):
+            partido, provincia, genero, pais_nacimiento, estado_civil):
         """Crea un nuevo empleado"""
         try:
             with db.conn.cursor() as cur:
@@ -63,7 +63,7 @@ class Empleado:
                     """
                     INSERT INTO empleados (id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                     fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, localidad, partido, provincia, 
-                    genero, nacionalidad, estado_civil)
+                    genero, pais_nacimiento, estado_civil)
                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING id_empleado
                     """,
@@ -82,7 +82,7 @@ class Empleado:
                         partido,
                         provincia,
                         genero,
-                        nacionalidad,
+                        pais_nacimiento,
                         estado_civil
                     )
                 )
@@ -101,7 +101,7 @@ class Empleado:
                 """
                 SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                     fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, 
-                    localidad, partido, provincia, genero, nacionalidad, estado_civil
+                    localidad, partido, provincia, genero, pais_nacimiento, estado_civil
                 FROM empleados
                 WHERE id_empleado = %s
                 """,
@@ -124,7 +124,7 @@ class Empleado:
                     partido=result[11],
                     provincia=result[12],
                     genero=result[13],
-                    nacionalidad=result[14],
+                    pais_nacimiento=result[14],
                     estado_civil=result[15]
                 )
             return None  # En caso de no encontrar
@@ -137,7 +137,7 @@ class Empleado:
                 """
                 SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
                     fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, 
-                    localidad, partido, provincia, genero, nacionalidad, estado_civil
+                    localidad, partido, provincia, genero, pais_nacimiento, estado_civil
                 FROM empleados
                 WHERE numero_identificacion = %s
                 """,
@@ -160,7 +160,7 @@ class Empleado:
                     partido=result[11],
                     provincia=result[12],
                     genero=result[13],
-                    nacionalidad=result[14],
+                    pais_nacimiento=result[14],
                     estado_civil=result[15]
                 )
             return None
