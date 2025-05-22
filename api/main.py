@@ -123,7 +123,7 @@ def calcular_horas(empleado_id: str, año: int, mes: int):
 def actualizar_datos_empleado(
     empleado_id: int,
     datos: EmpleadoUpdate,
-    # Agrega autenticación para que solo el empleado o admin pueda actualizar
+    # Agregar autenticación para que solo el empleado o admin pueda actualizar
 ):
     try:
         empleado_actualizado = Empleado.actualizar_datos_personales(
