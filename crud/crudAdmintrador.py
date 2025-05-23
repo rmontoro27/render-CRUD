@@ -10,46 +10,109 @@ from api.schemas import EmpleadoResponse
 
 class AdminCRUD:
     @staticmethod
-    def crear_empleado(nuevoEmpleado):
-        """Registra un nuevo empleado con todos los campos"""
-        try:
-            with db.conn.cursor() as cur:
-                cur.execute(
-                    """
+    def crear_empleado(nuevo_empleado):
+            """
+            Registra un nuevo empleado con manejo mejorado de errores y conexiones
+
+            Args:
+                nuevo_empleado: Objeto con los datos del empleado
+
+            Returns:
+                dict: Datos básicos del empleado creado
+
+            Raises:
+                ValueError: Para errores de negocio (ej: duplicados)
+                Exception: Para otros errores inesperados
+            """
+            conn = None
+            try:
+                # 1. Obtener conexión del pool
+                conn = db.get_connection()
+                cur = conn.cursor()
+
+                # 2. Validación de campos obligatorios
+                campos_requeridos = ['nombre', 'apellido', 'numero_identificacion', 'telefono']
+                for campo in campos_requeridos:
+                    if not getattr(nuevo_empleado, campo, None):
+                        raise ValueError(f"El campo {campo} es obligatorio")
+
+                # 3. Consulta SQL con parámetros nombrados para claridad
+                query = """
                     INSERT INTO empleado (
                         nombre, apellido, tipo_identificacion, numero_identificacion,
                         fecha_nacimiento, correo_electronico, telefono, calle,
-                        numero_calle, localidad, partido, provincia, genero, pais_nacimiento, estado_civil
+                        numero_calle, localidad, partido, provincia, genero, 
+                        pais_nacimiento, estado_civil
                     )
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    VALUES (
+                        %(nombre)s, %(apellido)s, %(tipo_identificacion)s, 
+                        %(numero_identificacion)s, %(fecha_nacimiento)s, 
+                        %(correo_electronico)s, %(telefono)s, %(calle)s,
+                        %(numero_calle)s, %(localidad)s, %(partido)s, 
+                        %(provincia)s, %(genero)s, %(pais_nacimiento)s, 
+                        %(estado_civil)s
+                    )
                     RETURNING id_empleado, numero_identificacion, nombre, apellido
-                    """,
-                    (
-                        nuevoEmpleado.nombre, nuevoEmpleado.apellido, nuevoEmpleado.tipo_identificacion,
-                        nuevoEmpleado.numero_identificacion,
-                        nuevoEmpleado.fecha_nacimiento, nuevoEmpleado.correo_electronico, nuevoEmpleado.telefono,
-                        nuevoEmpleado.calle,
-                        nuevoEmpleado.numero_calle, nuevoEmpleado.localidad, nuevoEmpleado.partido,
-                        nuevoEmpleado.provincia,  # Aquí agregamos provincia
-                        nuevoEmpleado.genero, nuevoEmpleado.pais_nacimiento, nuevoEmpleado.estado_civil
-                    )
-                )
-                empleado = cur.fetchone()
-                db.conn.commit()
-                return {
-                    "id_empleado": empleado[0],
-                    "numero_identificacion": empleado[1],
-                    "nombre": empleado[2],
-                    "apellido": empleado[3]
+                """
+
+                # 4. Parámetros como diccionario para mejor legibilidad
+                params = {
+                    'nombre': nuevo_empleado.nombre,
+                    'apellido': nuevo_empleado.apellido,
+                    'tipo_identificacion': nuevo_empleado.tipo_identificacion,
+                    'numero_identificacion': nuevo_empleado.numero_identificacion,
+                    'fecha_nacimiento': nuevo_empleado.fecha_nacimiento,
+                    'correo_electronico': nuevo_empleado.correo_electronico,
+                    'telefono': nuevo_empleado.telefono,
+                    'calle': nuevo_empleado.calle,
+                    'numero_calle': nuevo_empleado.numero_calle,
+                    'localidad': nuevo_empleado.localidad,
+                    'partido': nuevo_empleado.partido,
+                    'provincia': nuevo_empleado.provincia,
+                    'genero': nuevo_empleado.genero,
+                    'pais_nacimiento': nuevo_empleado.pais_nacimiento,
+                    'estado_civil': nuevo_empleado.estado_civil
                 }
-        except psycopg2.IntegrityError as e:
-            db.conn.rollback()
-            if "numero_identificacion" in str(e):
-                raise ValueError("El número de identificación ya está registrado")
-            raise ValueError(f"Error de integridad: {e}")
-        except Exception as e:
-            db.conn.rollback()
-            raise Exception(f"Error al crear empleado: {e}")
+
+                # 5. Ejecutar consulta
+                cur.execute(query, params)
+                empleado_creado = cur.fetchone()
+                conn.commit()
+
+                # 6. Retornar datos formateados
+                return {
+                    "id_empleado": empleado_creado[0],
+                    "numero_identificacion": empleado_creado[1],
+                    "nombre": empleado_creado[2],
+                    "apellido": empleado_creado[3],
+                    "mensaje": "Empleado creado exitosamente"
+                }
+
+            except psycopg2.IntegrityError as e:
+                conn.rollback() if conn else None
+                error_msg = str(e).lower()
+
+                if "numero_identificacion" in error_msg:
+                    raise ValueError("El número de identificación ya está registrado")
+                elif "correo_electronico" in error_msg:
+                    raise ValueError("El correo electrónico ya está en uso")
+                elif "violates not-null" in error_msg:
+                    columna = error_msg.split('column "')[1].split('"')[0]
+                    raise ValueError(f"El campo {columna} es obligatorio")
+                else:
+                    raise ValueError(f"Error de integridad en la base de datos: {e}")
+
+            except psycopg2.OperationalError as e:
+                conn.rollback() if conn else None
+                raise Exception(f"Error de conexión con la base de datos: {str(e)}")
+
+            except Exception as e:
+                conn.rollback() if conn else None
+                raise Exception(f"Error inesperado al crear empleado: {str(e)}")
+
+            finally:
+                if conn:
+                    db.return_connection(conn)
 
     @staticmethod
     def obtener_empleado():
