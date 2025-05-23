@@ -121,15 +121,29 @@ def crear_empleado(empleado: EmpleadoBase):
         raise HTTPException(status_code=400, detail=str(e))
 """
 
+
 @app.post("/empleados/", response_model=EmpleadoResponse)
 async def crear_empleado(empleado: EmpleadoBase):
     try:
+        print(f"[API] Inicio creación empleado - Datos recibidos:")
+        print(f"Nombre: {empleado.nombre}")
+        print(f"Apellido: {empleado.apellido}")
+        # Agrega logs para otros campos importantes
+
         empleado_creado = AdminCRUD.crear_empleado(empleado)
+        print("[API] Empleado creado exitosamente")
         return empleado_creado
     except ValueError as e:
+        print(f"[API] Error de valor: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        import traceback
+        tb = traceback.format_exc()
+        print(f"[API] Error inesperado:\n{tb}")
+        raise HTTPException(
+            status_code=500,
+            detail="Error interno del servidor"
+        )
 
 @app.get("/empleados/{numero_identificacion}")
 def obtener_empleado(numero_identificacion: str):
