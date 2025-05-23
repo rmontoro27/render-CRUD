@@ -18,6 +18,7 @@ from typing import List
 from typing import Tuple, List
 from .schemas import EmpleadoResponse, EmpleadoBase, EmpleadoUpdate
 from fastapi import APIRouter, HTTPException
+from crud.database import db
 
 
 
