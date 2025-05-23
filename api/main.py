@@ -242,7 +242,7 @@ def registrar_asistencia_manual(
 @app.get("/empleados/")
 def listar_empleados():
     try:
-        empleados = AdminCRUD.obtener_empleados()
+        empleados = AdminCRUD.obtener_empleado()
         return [e for e in empleados]
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
