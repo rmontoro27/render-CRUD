@@ -138,7 +138,9 @@ class AdminCRUD:
     @staticmethod
     def obtener_empleado():
         """Lista todos los empleados con información básica"""
-        with db.conn.cursor() as cur:
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
             cur.execute(
                 """
                 SELECT id_empleado, numero_identificacion, nombre, apellido, correo_electronico, telefono
