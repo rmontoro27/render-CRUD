@@ -15,10 +15,11 @@ from crud.crudAdmintrador import AdminCRUD
 from crud.crudEmpleado import RegistroHorario
 from crud.crudEmpleado import Empleado
 from crud.crudNomina import NominaCRUD
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
 from typing import Tuple, List
-from .schemas import EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResponse, NominaBase, NominaListResponse
+from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResponse,
+                      NominaBase, NominaListResponse, EmpleadoNominaRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 
