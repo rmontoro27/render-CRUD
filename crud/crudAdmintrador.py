@@ -159,6 +159,9 @@ class AdminCRUD:
                 }
                 for row in cur.fetchall()
             ]
+        finally:
+            if conn:
+                db.return_connection(conn)
 
     @staticmethod
     def obtener_detalle_empleado(numero_identificacion: str):
