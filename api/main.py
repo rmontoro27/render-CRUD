@@ -3,6 +3,7 @@ import os
 #import cv2
 #import face_recognition
 import numpy as np
+import router
 from fastapi import FastAPI, HTTPException, Depends
 from crud import crudEmpleado, crudAdmintrador
 import uuid
@@ -16,6 +17,7 @@ from pydantic import BaseModel
 from typing import List
 from typing import Tuple, List
 from .schemas import EmpleadoResponse, EmpleadoBase, EmpleadoUpdate
+from fastapi import APIRouter, HTTPException
 
 
 
