@@ -3,7 +3,7 @@ import os
 #import cv2
 #import face_recognition
 import numpy as np
-import router
+
 from fastapi import FastAPI, HTTPException, Depends
 from crud import crudEmpleado, crudAdmintrador
 import uuid
@@ -57,7 +57,7 @@ class AsistenciaManual(BaseModel):
 app = FastAPI()
 
 
-@router.get("/health")
+@app.get("/health")
 def health_check():
     """
     Verifica el estado de la API y conexión a la base de datos
