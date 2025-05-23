@@ -53,6 +53,46 @@ class AsistenciaManual(BaseModel):
 
 app = FastAPI()
 
+
+@router.get("/health")
+def health_check():
+    """
+    Verifica el estado de la API y conexión a la base de datos
+    Returns:
+        {
+            "status": "healthy"|"unhealthy",
+            "database": true|false,
+            "timestamp": "ISO-8601",
+            "details": {
+                "database_status": "string"
+            }
+        }
+    """
+    try:
+        # Verificar conexión a la base de datos
+        db_ok = db.health_check()
+
+        status = "healthy" if db_ok else "unhealthy"
+
+        return {
+            "status": status,
+            "database": db_ok,
+            "timestamp": datetime.utcnow().isoformat(),
+            "details": {
+                "database_status": "Connected" if db_ok else "Disconnected"
+            }
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "unhealthy",
+                "error": str(e),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        )
+
 @app.post("/empleados/", response_model=EmpleadoResponse)
 def crear_empleado(empleado: EmpleadoBase):
     try:

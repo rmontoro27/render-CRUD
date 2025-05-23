@@ -14,7 +14,8 @@ class Database:
         "password": "npg_T2tevF4uMhZB",  # Contraseña (DEBES configurarla en .env)
         "host": "ep-gentle-poetry-a48jtsf3-pooler.us-east-1.aws.neon.tech",  # Endpoint de Supabase
         "port": "5432",        # Puerto por defecto
-        # Opcional: forzar SSL (recomendado para Supabase)
+        "sslmode": "require",  # SSL obligatorio para Neon
+        "connect_timeout": 5  # Timeout de conexión de 5 segundos
 
     }
 
@@ -22,35 +23,56 @@ class Database:
         self.conn = None
         self.connect()
 
-    def connect(self):
-        """Establece la conexión a la BD"""
+    def _initialize_pool(self, retries=3, delay=2):
+        """Intenta crear el pool de conexiones con reintentos"""
+        for attempt in range(retries):
+            try:
+                self.connection_pool = pool.SimpleConnectionPool(
+                    minconn=1,
+                    maxconn=10,
+                    **self._config
+                )
+                print("✅ Pool de conexiones creado exitosamente")
+                return
+            except psycopg2.OperationalError as e:
+                print(f"⚠️ Intento {attempt + 1} fallido: {str(e)}")
+                if attempt < retries - 1:
+                    time.sleep(delay)
+        raise RuntimeError("No se pudo establecer el pool de conexiones después de varios intentos")
+
+    def get_connection(self):
+        """Obtiene una conexión del pool con manejo de errores"""
         try:
-            self.conn = psycopg2.connect(**self._config)
-            print("✅ Conexión exitosa a Supabase PostgreSQL")
+            return self.connection_pool.getconn()
+        except:
+            # Intenta recrear el pool si hay problemas
+            self._initialize_pool()
+            return self.connection_pool.getconn()
+
+    def return_connection(self, connection):
+        """Devuelve una conexión al pool"""
+        try:
+            self.connection_pool.putconn(connection)
+        except:
+            # Si hay error al devolver, cierra la conexión
+            connection.close()
+
+    def health_check(self):
+        """Verifica el estado de la base de datos"""
+        conn = None
+        try:
+            conn = self.get_connection()
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+                result = cur.fetchone()
+                return result[0] == 1
         except Exception as e:
-            print(f"❌ Error al conectar: {e}")
-            raise
+            print(f"❌ Error en health check: {str(e)}")
+            return False
+        finally:
+            if conn:
+                self.return_connection(conn)
 
-    def get_cursor(self):
-        """Devuelve un cursor para ejecutar queries"""
-        if not self.conn or self.conn.closed:
-            self.connect()  # Reconecta si la conexión está cerrada
-        return self.conn.cursor()
-
-    def close(self):
-        """Cierra conexión y cursor"""
-        if self.conn and not self.conn.closed:
-            self.conn.close()
-            print("🔌 Conexión cerrada")
-
-    # Método estático para connection pooling (opcional)
-    @staticmethod
-    def get_connection_pool(minconn=1, maxconn=10):
-        return pool.SimpleConnectionPool(
-            minconn=minconn,
-            maxconn=maxconn,
-            **Database._config
-        )
 
 # Instancia global (para uso en otros módulos)
 db = Database()
