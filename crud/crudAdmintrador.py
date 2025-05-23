@@ -166,7 +166,9 @@ class AdminCRUD:
     @staticmethod
     def obtener_detalle_empleado(numero_identificacion: str):
         """Obtiene todos los datos de un empleado"""
-        with db.conn.cursor() as cur:
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
             cur.execute(
                 """
                 SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion,
@@ -198,6 +200,9 @@ class AdminCRUD:
                     "estado_civil": result[15],
                 }
             return None
+        finally:
+            if conn:
+                db.return_connection(conn)
 
     @staticmethod
     def registrar_jornada_calendario(id_empleado: int, fecha: date, estado_jornada: str,
@@ -206,7 +211,8 @@ class AdminCRUD:
                                      descripcion: str = None):
         """Registra o actualiza una jornada en el calendario"""
         try:
-            with db.conn.cursor() as cur:
+                conn = db.get_connection()
+                cur = conn.cursor()
                 # Verificar si ya existe registro para esa fecha
                 cur.execute(
                     "SELECT 1 FROM calendario WHERE id_empleado = %s AND fecha = %s",
@@ -258,6 +264,9 @@ class AdminCRUD:
         except Exception as e:
             db.conn.rollback()
             raise Exception(f"Error al registrar jornada: {e}")
+        finally:
+            if conn:
+                db.return_connection(conn)
 
     @staticmethod
     def obtener_calendario_empleado(id_empleado: int, mes: int = None, año: int = None):
@@ -277,7 +286,9 @@ class AdminCRUD:
 
         query += " ORDER BY fecha DESC"
 
-        with db.conn.cursor() as cur:
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
             cur.execute(query, params)
             return [
                 {
@@ -293,11 +304,16 @@ class AdminCRUD:
                 }
                 for row in cur.fetchall()
             ]
+        finally:
+            if conn:
+                db.return_connection(conn)
 
     @staticmethod
     def buscar_empleado_por_numero_identificacion(numero_identificacion: str):
         """Busca un empleado por número de identificación"""
-        with db.conn.cursor() as cur:
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
             cur.execute(
                 """
                 SELECT id_empleado, numero_identificacion, nombre, apellido, correo_electronico, telefono
@@ -317,6 +333,9 @@ class AdminCRUD:
                     "telefono": result[5]
                 }
             return None
+        finally:
+            if conn:
+                db.return_connection(conn)
 
     @staticmethod
     def buscar_avanzado(
@@ -400,6 +419,7 @@ class AdminCRUD:
 
         return empleados, total
 
+
     @staticmethod
     def buscar_informacion_laboral_por_id_empleado(id_empleado: int):
         """
@@ -413,7 +433,9 @@ class AdminCRUD:
             horario_salida, fecha_ingreso, tipo_contrato) o None si no se encuentra.
         """
         try:
-            with db.conn.cursor() as cur:
+
+                conn = db.get_connection()
+                cur = conn.cursor()
                 query = """
                     SELECT 
                         d.nombre,
@@ -435,3 +457,6 @@ class AdminCRUD:
         except Exception as e:
             print(f"Error al buscar información laboral: {str(e)}")
             raise ValueError(f"No se pudo obtener la información laboral: {str(e)}")
+        finally:
+            if conn:
+                db.return_connection(conn)
