@@ -22,6 +22,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       NominaBase, NominaListResponse, EmpleadoNominaRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
+from fastapi.middleware.cors import CORSMiddleware
 
 
 
@@ -64,6 +65,14 @@ class CalculoNominaRequest(BaseModel):
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite todos los orígenes
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todos los headers
+)
 
 
 @app.get("/health")
