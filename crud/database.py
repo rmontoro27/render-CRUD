@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import pool  # Opcional para connection pooling
 import os
+from datetime import datetime, timedelta, date, time
 
 
 # Cargar variables de entorno desde .env
@@ -20,8 +21,8 @@ class Database:
     }
 
     def __init__(self):
-        self.conn = None
-        self.connect()
+        self.connection_pool = None
+        self._initialize_pool()
 
     def _initialize_pool(self, retries=3, delay=2):
         """Intenta crear el pool de conexiones con reintentos"""
