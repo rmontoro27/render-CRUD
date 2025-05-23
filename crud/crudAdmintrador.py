@@ -12,12 +12,13 @@ class AdminCRUD:
     @staticmethod
     def crear_empleado(nuevo_empleado):
         try:
-            with db.conn.cursor() as cur:
-                # Convertir numero_calle a string si es necesario
-                numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado, 'numero_calle') else None
+            conn = db.get_connection()
+            cur = conn.cursor()
+            # Convertir numero_calle a string si es necesario
+            numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado, 'numero_calle') else None
 
-                # Query con RETURNING para obtener el ID generado
-                cur.execute(
+            # Query con RETURNING para obtener el ID generado
+            cur.execute(
                     """
                     INSERT INTO empleado (
                         nombre, apellido, tipo_identificacion, numero_identificacion,
@@ -39,12 +40,12 @@ class AdminCRUD:
                     )
                 )
 
-                # Obtener todos los datos del empleado creado
-                resultado = cur.fetchone()
-                db.conn.commit()
+            # Obtener todos los datos del empleado creado
+            resultado = cur.fetchone()
+            db.conn.commit()
 
-                # Construir respuesta con TODOS los campos requeridos por el modelo Pydantic
-                return {
+            # Construir respuesta con TODOS los campos requeridos por el modelo Pydantic
+            return {
                     "id_empleado": resultado[0],  # Asegúrate de incluir esto
                     "nombre": resultado[1],
                     "apellido": resultado[2],

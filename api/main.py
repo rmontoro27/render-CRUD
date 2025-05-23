@@ -95,7 +95,7 @@ def health_check():
                 "timestamp": datetime.utcnow().isoformat()
             }
         )
-
+""""
 @app.post("/empleados/", response_model=EmpleadoResponse)
 def crear_empleado(empleado: EmpleadoBase):
     try:
@@ -119,6 +119,17 @@ def crear_empleado(empleado: EmpleadoBase):
         }
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+"""
+
+@app.post("/empleados/", response_model=EmpleadoResponse)
+async def crear_empleado(empleado: EmpleadoBase):
+    try:
+        empleado_creado = AdminCRUD.crear_empleado(empleado)
+        return empleado_creado
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @app.get("/empleados/{numero_identificacion}")
 def obtener_empleado(numero_identificacion: str):
