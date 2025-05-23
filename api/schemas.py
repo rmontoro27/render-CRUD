@@ -30,7 +30,7 @@ class EmpleadoBase(BaseModel):
         correo_electronico: str
         telefono: str
         calle: str
-        numero_calle: int
+        numero_calle: str
         localidad: str
         partido: str
         provincia: str
