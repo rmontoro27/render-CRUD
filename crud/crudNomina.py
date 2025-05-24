@@ -191,6 +191,6 @@ class NominaCRUD:
         finally:
 
             if conn:
-                self.return_connection(conn)
+                self.db.return_connection(conn)
 
 
