@@ -66,7 +66,7 @@ class NominaResponse(NominaBase):
     descuento_sindical: Optional[float] = None
     sueldo_bruto: float
     sueldo_neto: float
-    estado: str
+
 
 class NominaListResponse(BaseModel):
     nominas: list[NominaResponse]
