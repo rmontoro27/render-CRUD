@@ -309,14 +309,14 @@ async def obtener_nominas_empleado(id_empleado: int):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-# Búsqueda con filtro por período (POST con body)
 @app.post("/nominas/empleado/buscar", response_model=NominaListResponse)
 async def buscar_nominas_empleado(request: EmpleadoNominaRequest):
     try:
-        nominas = NominaCRUD.obtener_nominas_empleado(request.id_empleado)
+        nomina_crud = NominaCRUD()
+        nominas = nomina_crud.obtener_nominas_empleado(request.id_empleado)
 
         if request.periodo:
-            nominas = [n for n in nominas if n['periodo'] == request.periodo]
+            nominas = [n for n in nominas if n.periodo == request.periodo]
 
         return {"nominas": nominas}
     except ValueError as e:
