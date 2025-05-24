@@ -575,7 +575,9 @@ class RegistroHorario:
         inicio = datetime(año, mes, 1).date()
         fin = (inicio + timedelta(days=31)).replace(day=1)
 
-        with db.conn.cursor() as cur:
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
             cur.execute(
                 """
                 SELECT SUM(horas_trabajadas) 
@@ -588,11 +590,16 @@ class RegistroHorario:
             )
             resultado = cur.fetchone()
             return resultado[0] if resultado[0] else 0.0  # Si no hay registros, devuelve 0.0
+        finally:
+            if conn:
+                db.return_connection(conn)
 
     @staticmethod
     def obtener_todos_los_registros(empleado_id):
         """Obtiene todos los registros de jornada de un empleado"""
-        with db.conn.cursor() as cur:
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
             cur.execute(
                 """
                 SELECT id_registro_jornada, id_empleado, fecha,  dia, hora_entrada, hora_salida, estado_jornada, horas_trabajadas, observaciones
@@ -603,6 +610,10 @@ class RegistroHorario:
                 (empleado_id,)
             )
             return cur.fetchall()  # Devuelve todos los registros del empleado
+        finally:
+            if conn:
+                db.return_connection(conn)
+
 
     @staticmethod
     def calcular_horas_mensuales(empleado_id, año, mes):
