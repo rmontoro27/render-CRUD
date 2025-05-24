@@ -570,7 +570,7 @@ class RegistroHorario:
                 f"el {self.fecha} a las {self.hora} ({self.estado_asistencia})>")
 
     @staticmethod
-    def calcular_horas_mensuales(empleado_id, año, mes):
+    def calcular_horas_mensuales2(empleado_id, año, mes):
         """Calcula la suma total de horas trabajadas en un mes"""
         inicio = datetime(año, mes, 1).date()
         fin = (inicio + timedelta(days=31)).replace(day=1)
@@ -616,12 +616,14 @@ class RegistroHorario:
 
 
     @staticmethod
-    def calcular_horas_mensuales2(empleado_id, año, mes):
+    def calcular_horas_mensuales(empleado_id, año, mes):
         """Calcula la suma total de horas trabajadas en un mes"""
         inicio = datetime(año, mes, 1).date()
         fin = (inicio + timedelta(days=31)).replace(day=1)
 
-        with db.conn.cursor() as cur:
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
             cur.execute(
                 """
                 SELECT SUM(horas_normales_trabajadas)
@@ -634,6 +636,9 @@ class RegistroHorario:
             )
             resultado = cur.fetchone()
             return resultado[0] if resultado[0] else 0.0  # Si no hay registros, devuelve 0.0
+        finally:
+            if conn:
+                db.return_connection(conn)
 
 
 
