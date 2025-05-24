@@ -189,7 +189,7 @@ def obtener_registros(
     if año and mes:
         registros = RegistroHorario.obtener_registros_mensuales(empleado_id, año, mes)
     else:
-        registros = RegistroHorario.obtener_todos(empleado_id)
+        registros = RegistroHorario.obtener_todos_los_registros(empleado_id)
     return [r for r in registros]
 
 @app.get("/registroscompleto/{empleado_id}")
