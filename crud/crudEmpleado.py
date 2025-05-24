@@ -580,7 +580,7 @@ class RegistroHorario:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT SUM(horas_trabajadas) 
+                SELECT SUM(horas_normales_trabajadas) 
                 FROM registro_jornada 
                 WHERE id_empleado = %s 
                 AND dia >= %s 
