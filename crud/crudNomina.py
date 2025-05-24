@@ -30,7 +30,7 @@ class NominaCRUD:
                     (id_empleado, periodo_texto)
                 )
                 cur.execute(
-                    "INSERT INTO nominas (fecha) VALUES (%s)",
+                    "INSERT INTO nomina (fecha) VALUES (%s)",
                     (fecha_calculo,)  # Psycopg2 maneja la conversión
                 )
                 periodo_result = cur.fetchone()
