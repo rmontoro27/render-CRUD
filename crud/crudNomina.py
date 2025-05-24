@@ -2,25 +2,13 @@ import psycopg2
 from datetime import datetime, timedelta
 from typing import Optional, List
 from api.schemas import NominaBase, NominaResponse
-
+from .database import db
 
 class NominaCRUD:
     def __init__(self):
 
-        self.connection_pool = psycopg2.pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=10,
-            host="ep-gentle-poetry-a48jtsf3-pooler.us-east-1.aws.neon.tech",
-            database="database_labo",
-            user="database_labo_owner",
-            password="npg_T2tevF4uMhZB"
-        )
+        self.db = db
 
-    def get_connection(self):
-        return self.connection_pool.getconn()
-
-    def return_connection(self, conn):
-        self.connection_pool.putconn(conn)
 
     def calcular_nomina(self, id_empleado: int, periodo_texto: str, fecha_calculo: str):
         """
