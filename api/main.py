@@ -310,9 +310,11 @@ async def obtener_nominas_empleado(id_empleado: int):
 
 
 @app.post("/nominas/empleado/buscar", response_model=NominaListResponse)
-async def buscar_nominas_empleado(request: EmpleadoNominaRequest):
+async def buscar_nominas_empleado(
+    request: EmpleadoNominaRequest,
+    nomina_crud: NominaCRUD = Depends()
+):
     try:
-        nomina_crud = NominaCRUD()
         nominas = nomina_crud.obtener_nominas_empleado(request.id_empleado)
 
         if request.periodo:
