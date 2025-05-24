@@ -336,7 +336,10 @@ async def obtener_nomina(id_nomina: int):
 
 
 @app.post("/calcular", response_model=NominaResponse)
-async def calcular_nomina_endpoint(request: CalculoNominaRequest, crud: NominaCRUD = Depends()):
+async def calcular_nomina_endpoint(
+        request: CalculoNominaRequest,
+        nomina_crud: NominaCRUD = Depends()
+):
     """
     Calcula la nómina para un empleado en un período específico.
 
@@ -346,7 +349,7 @@ async def calcular_nomina_endpoint(request: CalculoNominaRequest, crud: NominaCR
     - fecha_calculo (opcional): Fecha de cálculo (default: hoy)
     """
     try:
-        return NominaCRUD.calcular_nomina(
+        return nomina_crud.calcular_nomina(
             id_empleado=request.id_empleado,
             periodo_texto=request.periodo,
             fecha_calculo=request.fecha_calculo
