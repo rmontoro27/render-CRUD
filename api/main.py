@@ -47,8 +47,8 @@ from fastapi.middleware.cors import CORSMiddleware
     #return vector_neutro
 
 
-def get_nomina_crud(db = Depends(get_db)):
-    return NominaCRUD(db)
+#def get_nomina_crud(db = Depends(get_db)):
+#    return NominaCRUD(db)
 
 
 

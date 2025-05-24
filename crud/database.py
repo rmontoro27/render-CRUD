@@ -75,13 +75,13 @@ class Database:
             if conn:
                 self.return_connection(conn)
 
-    @contextmanager
-    def get_db():
-        db = Database(settings.DB_URL)  # Ejemplo con configuración
-        try:
-            yield db
-        finally:
-            db.close()
+#    @contextmanager
+#    def get_db():
+#        db = Database(settings.DB_URL)  # Ejemplo con configuración
+#        try:
+#            yield db
+#        finally:
+#            db.close()
 
 
 # Instancia global (para uso en otros módulos)
