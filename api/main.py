@@ -47,8 +47,7 @@ from fastapi.middleware.cors import CORSMiddleware
     #return vector_neutro
 
 
-#def get_nomina_crud(db = Depends(get_db)):
-#    return NominaCRUD(db)
+
 
 
 
@@ -336,30 +335,21 @@ async def obtener_nomina(id_nomina: int):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-#@app.post("/calcular", response_model=NominaResponse)
-#async def calcular_nomina_endpoint(
-#        request: CalculoNominaRequest,
- #       nomina_crud: NominaCRUD = Depends(get_nomina_crud)
-#):
- #   """
-  #  Calcula la nómina para un empleado en un período específico.
-#
- #   Parámetros desde el frontend:
-  #  - id_empleado: ID del empleado
-   # - periodo: Período a calcular (ej. "MAYO 2024")
-    #- fecha_calculo (opcional): Fecha de cálculo (default: hoy)
+@app.post("/calcular", response_model=NominaResponse)
+async def calcular_nomina_endpoint(request: CalculoNominaRequest):
+    """
+    Calcula la nómina para un empleado en un período específico.
+
+    Parámetros desde el frontend:
+    - id_empleado: ID del empleado
+    - periodo: Período a calcular (ej. "MAYO 2024")
+    - fecha_calculo (opcional): Fecha de cálculo (default: hoy)
     """
     try:
-        return nomina_crud.calcular_nomina(
+        return NominaCRUD.calcular_nomina(
             id_empleado=request.id_empleado,
             periodo_texto=request.periodo,
             fecha_calculo=request.fecha_calculo.isoformat()
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error interno al calcular nómina: {str(e)}"
-        )
-    """

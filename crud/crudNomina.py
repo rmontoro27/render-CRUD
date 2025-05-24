@@ -5,8 +5,22 @@ from api.schemas import NominaBase, NominaResponse
 
 
 class NominaCRUD:
-    def __init__(self, db):
-        self.db = db
+    def __init__(self):
+
+        self.connection_pool = psycopg2.pool.SimpleConnectionPool(
+            minconn=1,
+            maxconn=10,
+            host="ep-gentle-poetry-a48jtsf3-pooler.us-east-1.aws.neon.tech",
+            database="database_labo",
+            user="database_labo_owner",
+            password="npg_T2tevF4uMhZB"
+        )
+
+    def get_connection(self):
+        return self.connection_pool.getconn()
+
+    def return_connection(self, conn):
+        self.connection_pool.putconn(conn)
 
     def calcular_nomina(self, id_empleado: int, periodo_texto: str, fecha_calculo: str):
         """
@@ -255,8 +269,10 @@ class NominaCRUD:
             columns = [desc[0] for desc in cur.description]
             return [NominaResponse(**dict(zip(columns, row))) for row in cur.fetchall()]
 
+
         finally:
+
             if conn:
-                self.db.return_connection(conn)
+                self.return_connection(conn)
 
 
