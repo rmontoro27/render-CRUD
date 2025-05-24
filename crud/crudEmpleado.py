@@ -616,7 +616,7 @@ class RegistroHorario:
 
 
     @staticmethod
-    def calcular_horas_mensuales(empleado_id, año, mes):
+    def calcular_horas_mensuales2(empleado_id, año, mes):
         """Calcula la suma total de horas trabajadas en un mes"""
         inicio = datetime(año, mes, 1).date()
         fin = (inicio + timedelta(days=31)).replace(day=1)
