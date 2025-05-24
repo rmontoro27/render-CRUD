@@ -47,7 +47,8 @@ from fastapi.middleware.cors import CORSMiddleware
     #return vector_neutro
 
 
-
+def get_nomina_crud(db = Depends(get_db)):
+    return NominaCRUD(db)
 
 
 
@@ -338,7 +339,7 @@ async def obtener_nomina(id_nomina: int):
 @app.post("/calcular", response_model=NominaResponse)
 async def calcular_nomina_endpoint(
         request: CalculoNominaRequest,
-        nomina_crud: NominaCRUD = Depends(NominaCRUD)
+        nomina_crud: NominaCRUD = Depends(get_nomina_crud)
 ):
     """
     Calcula la nómina para un empleado en un período específico.

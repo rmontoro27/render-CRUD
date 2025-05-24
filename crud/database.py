@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2 import pool  # Opcional para connection pooling
 import os
 from datetime import datetime, timedelta, date, time
+from contextlib import contextmanager
 
 
 # Cargar variables de entorno desde .env
@@ -73,6 +74,14 @@ class Database:
         finally:
             if conn:
                 self.return_connection(conn)
+
+    @contextmanager
+    def get_db():
+        db = Database(settings.DB_URL)  # Ejemplo con configuración
+        try:
+            yield db
+        finally:
+            db.close()
 
 
 # Instancia global (para uso en otros módulos)
