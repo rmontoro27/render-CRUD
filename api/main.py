@@ -349,7 +349,7 @@ async def calcular_nomina_endpoint(request: CalculoNominaRequest, crud: NominaCR
         return NominaCRUD.calcular_nomina(
             id_empleado=request.id_empleado,
             periodo_texto=request.periodo,
-            fecha_calculo=request.fecha_calculo.isoformat()
+            fecha_calculo=request.fecha_calculo
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

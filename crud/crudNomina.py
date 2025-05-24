@@ -1,5 +1,5 @@
 import psycopg2
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Optional, List
 from api.schemas import NominaBase, NominaResponse
 from .database import db
@@ -10,7 +10,7 @@ class NominaCRUD:
         self.db = db
 
 
-    def calcular_nomina(self, id_empleado: int, periodo_texto: str, fecha_calculo: str):
+    def calcular_nomina(self, id_empleado: int, periodo_texto: str, fecha_calculo: date):
         """
         Calcula la nómina completa para un empleado en un período específico
         """
@@ -27,6 +27,10 @@ class NominaCRUD:
             cur.execute(
                 "SELECT id_periodo FROM periodo_empleado WHERE id_empleado=%s AND periodo_texto=%s",
                 (id_empleado, periodo_texto)
+            )
+            cur.execute(
+                "INSERT INTO nominas (fecha) VALUES (%s)",
+                (fecha_calculo,)  # Psycopg2 maneja la conversión
             )
             periodo_result = cur.fetchone()
             if not periodo_result:

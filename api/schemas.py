@@ -74,7 +74,7 @@ class NominaListResponse(BaseModel):
 class CalculoNominaRequest(BaseModel):
     id_empleado: int
     periodo: str
-    fecha_calculo: date = date.today()
+    fecha_calculo: date
 
 class EmpleadoNominaRequest(BaseModel):
     id_empleado: int
