@@ -336,18 +336,18 @@ async def obtener_nomina(id_nomina: int):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/calcular", response_model=NominaResponse)
-async def calcular_nomina_endpoint(
-        request: CalculoNominaRequest,
-        nomina_crud: NominaCRUD = Depends(get_nomina_crud)
-):
-    """
-    Calcula la nómina para un empleado en un período específico.
-
-    Parámetros desde el frontend:
-    - id_empleado: ID del empleado
-    - periodo: Período a calcular (ej. "MAYO 2024")
-    - fecha_calculo (opcional): Fecha de cálculo (default: hoy)
+#@app.post("/calcular", response_model=NominaResponse)
+#async def calcular_nomina_endpoint(
+#        request: CalculoNominaRequest,
+ #       nomina_crud: NominaCRUD = Depends(get_nomina_crud)
+#):
+ #   """
+  #  Calcula la nómina para un empleado en un período específico.
+#
+ #   Parámetros desde el frontend:
+  #  - id_empleado: ID del empleado
+   # - periodo: Período a calcular (ej. "MAYO 2024")
+    #- fecha_calculo (opcional): Fecha de cálculo (default: hoy)
     """
     try:
         return nomina_crud.calcular_nomina(
@@ -362,3 +362,4 @@ async def calcular_nomina_endpoint(
             status_code=500,
             detail=f"Error interno al calcular nómina: {str(e)}"
         )
+    """
