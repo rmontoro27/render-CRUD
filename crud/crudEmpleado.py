@@ -130,6 +130,31 @@ class Empleado:
             return None  # En caso de no encontrar
 
     @staticmethod
+    def borrar_por_id(id_empleado):
+        """Elimina un empleado por su ID"""
+        with db.conn.cursor() as cur:
+            try:
+                # Primero verificamos si el empleado existe
+                cur.execute(
+                    "SELECT id_empleado FROM empleado WHERE id_empleado = %s",
+                    (str(id_empleado),)
+                )
+                if not cur.fetchone():
+                    return False  # No existe el empleado
+
+                # Si existe, procedemos a borrar
+                cur.execute(
+                    "DELETE FROM empleado WHERE id_empleado = %s",
+                    (str(id_empleado),)
+                )
+                db.conn.commit()
+                return True  # Borrado exitoso
+
+            except Exception as e:
+                db.conn.rollback()
+                raise ValueError(f"Error al borrar empleado: {str(e)}")
+
+    @staticmethod
     def obtener_por_numero_identificacion(numero_identificacion):
         """Obtiene un empleado por su número de identificación"""
         with db.conn.cursor() as cur:

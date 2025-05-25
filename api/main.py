@@ -23,7 +23,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi import HTTPException, status
 
 
 
@@ -178,7 +178,33 @@ def obtener_empleado(numero_identificacion: str):
   #      return registro
    # except ValueError as e:
     #    raise HTTPException(status_code=400, detail=str(e))
+@app.delete("/empleados/{id_empleado}", status_code=status.HTTP_204_NO_CONTENT)
+async def borrar_empleado(
+        id_empleado: int,
+        empleado_crud: Empleado = Depends()
+):
+    """
+    Elimina un empleado por su ID.
 
+    Devuelve:
+    - 204 No Content si se borró correctamente
+    - 404 Not Found si el empleado no existe
+    - 400 Bad Request si hay un error en la operación
+    """
+    try:
+        borrado_exitoso = empleado_crud.borrar_por_id(id_empleado)
+        if not borrado_exitoso:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Empleado no encontrado"
+            )
+        return EmpleadoResponse(status_code=status.HTTP_204_NO_CONTENT)
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 @app.get("/registros/{empleado_id}")
 def obtener_registros(
