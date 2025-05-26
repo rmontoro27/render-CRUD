@@ -140,7 +140,7 @@ def crear_empleado(empleado: EmpleadoBase):
 """
 
 
-@app.post("/empleados/", response_model=EmpleadoResponse)
+@app.post("/empleados/", response_model=EmpleadoBase)
 async def crear_empleado(empleado: EmpleadoBase):
     try:
         print(f"[API] Inicio creación empleado - Datos recibidos:")
