@@ -10,6 +10,7 @@ from api.schemas import EmpleadoResponse
 
 class AdminCRUD:
 
+
     @staticmethod
     def crear_empleado(nuevo_empleado):
         conn = None
