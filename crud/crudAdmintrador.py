@@ -69,17 +69,7 @@ class AdminCRUD:
             print(f"[ERROR] Error al crear empleado: {e}")
             raise
 
-            # Construir respuesta con TODOS los campos requeridos por el modelo Pydantic
-            return {
-                    "id_empleado": resultado[0],  # Asegúrate de incluir esto
-                    "nombre": resultado[1],
-                    "apellido": resultado[2],
-                    "numero_identificacion": resultado[3],
-                    "numero_calle": resultado[4],
-                    "telefono": resultado[5],
-                    "correo_electronico": resultado[6],
-                    # Incluye todos los demás campos que tu modelo Pydantic requiera
-                }
+
 
         except Exception as e:
             db.conn.rollback()
