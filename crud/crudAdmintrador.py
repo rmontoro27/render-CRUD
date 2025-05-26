@@ -12,6 +12,7 @@ class AdminCRUD:
 
     @staticmethod
     def crear_empleado(nuevo_empleado):
+        conn = None
         try:
             conn = db.get_connection()
             cur = conn.cursor()
