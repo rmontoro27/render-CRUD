@@ -11,7 +11,7 @@ from api.schemas import EmpleadoResponse
 class AdminCRUD:
 
     @staticmethod
-    def crear_empleado2(nuevo_empleado):
+    def crear_empleado(nuevo_empleado):
         try:
             conn = db.get_connection()
             cur = conn.cursor()
@@ -65,7 +65,7 @@ class AdminCRUD:
 
 
     @staticmethod
-    def crear_empleado(nuevo_empleado):
+    def crear_empleado2(nuevo_empleado):
         """Registra un nuevo empleado usando el pool de conexiones"""
         print("[DEBUG] Iniciando creación de empleado")
 
