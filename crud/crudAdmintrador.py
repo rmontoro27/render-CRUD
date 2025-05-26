@@ -48,10 +48,19 @@ class AdminCRUD:
                 "id_empleado": resultado[0],
                 "nombre": resultado[1],
                 "apellido": resultado[2],
+                "tipo_identificacion": nuevo_empleado.tipo_identificacion,
                 "numero_identificacion": resultado[3],
-                "numero_calle": resultado[4],
+                "fecha_nacimiento": nuevo_empleado.fecha_nacimiento,
+                "correo_electronico": resultado[6],
                 "telefono": resultado[5],
-                "correo_electronico": resultado[6]
+                "calle": nuevo_empleado.calle,
+                "numero_calle": resultado[4],
+                "localidad": nuevo_empleado.localidad,
+                "partido": nuevo_empleado.partido,
+                "provincia": nuevo_empleado.provincia,
+                "genero": nuevo_empleado.genero,
+                "pais_nacimiento": nuevo_empleado.pais_nacimiento,  # Ajustar nombre del campo si hace falta
+                "estado_civil": nuevo_empleado.estado_civil
             }
 
         except Exception as e:
