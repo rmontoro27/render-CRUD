@@ -384,3 +384,36 @@ async def calcular_nomina_endpoint(
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/{empleado_id}/puesto")
+def obtener_puesto_empleado(empleado_id: int):
+    try:
+        puesto = AdminCRUD.obtener_puesto_por_id_empleado(empleado_id)
+        if puesto:
+            return {"puesto": puesto}
+        raise HTTPException(status_code=404, detail="Puesto no encontrado para el empleado especificado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/{empleado_id}/categoria")
+def obtener_categoria_empleado(empleado_id: int):
+    try:
+        categoria = AdminCRUD.obtener_categoria_por_id_empleado(empleado_id)
+        if categoria:
+            return {"categoria": categoria}
+        raise HTTPException(status_code=404, detail="Categoría no encontrada para el empleado especificado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/{empleado_id}/departamento")
+def obtener_departamento_empleado(empleado_id: int):
+    try:
+        departamento_info = AdminCRUD.obtener_departamento_por_id_empleado(empleado_id)
+        if departamento_info:
+            return {
+                "departamento": departamento_info[0],
+                "descripcion": departamento_info[1] if departamento_info[1] else "Sin descripción"
+            }
+        raise HTTPException(status_code=404, detail="Departamento no encontrado para el empleado especificado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

@@ -473,3 +473,102 @@ class AdminCRUD:
         finally:
             if conn:
                 db.return_connection(conn)
+
+
+    @staticmethod
+    def obtener_puesto_por_id_empleado(id_empleado: int) -> Optional[str]:
+        """
+        Obtiene el puesto de un empleado por su ID.
+
+        Args:
+            id_empleado: ID del empleado a buscar
+
+        Returns:
+            Nombre del puesto o None si no se encuentra.
+        """
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            query = """
+                    SELECT p.nombre
+                    FROM informacion_laboral il
+                    JOIN puesto p ON il.id_puesto = p.id_puesto
+                    WHERE il.id_empleado = %s
+                    ORDER BY il.fecha_ingreso DESC
+                    LIMIT 1
+                """
+            cur.execute(query, (id_empleado,))
+            result = cur.fetchone()
+            return result[0] if result else None
+
+        except Exception as e:
+            print(f"Error al buscar puesto del empleado: {str(e)}")
+            raise ValueError(f"No se pudo obtener el puesto: {str(e)}")
+        finally:
+            if conn:
+                db.return_connection(conn)
+
+    @staticmethod
+    def obtener_categoria_por_id_empleado(id_empleado: int) -> Optional[str]:
+        """
+        Obtiene la categoría de un empleado por su ID.
+
+        Args:
+            id_empleado: ID del empleado a buscar
+
+        Returns:
+            Nombre de la categoría o None si no se encuentra.
+        """
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            query = """
+                    SELECT c.nombre_categoria
+                    FROM informacion_laboral il
+                    JOIN categoria c ON il.id_categoria = c.id_categoria
+                    WHERE il.id_empleado = %s
+                    ORDER BY il.fecha_ingreso DESC
+                    LIMIT 1
+                """
+            cur.execute(query, (id_empleado,))
+            result = cur.fetchone()
+            return result[0] if result else None
+
+        except Exception as e:
+            print(f"Error al buscar categoría del empleado: {str(e)}")
+            raise ValueError(f"No se pudo obtener la categoría: {str(e)}")
+        finally:
+            if conn:
+                db.return_connection(conn)
+
+    @staticmethod
+    def obtener_departamento_por_id_empleado(id_empleado: int) -> Optional[Tuple[str, str]]:
+        """
+        Obtiene el departamento de un empleado por su ID.
+
+        Args:
+            id_empleado: ID del empleado a buscar
+
+        Returns:
+            Tupla con (nombre_departamento, descripcion) o None si no se encuentra.
+        """
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            query = """
+                    SELECT d.nombre, d.descripcion
+                    FROM informacion_laboral il
+                    JOIN departamento d ON il.id_departamento = d.id_departamento
+                    WHERE il.id_empleado = %s
+                    ORDER BY il.fecha_ingreso DESC
+                    LIMIT 1
+                """
+            cur.execute(query, (id_empleado,))
+            return cur.fetchone()  # Retorna directamente la tupla de resultados
+
+        except Exception as e:
+            print(f"Error al buscar departamento del empleado: {str(e)}")
+            raise ValueError(f"No se pudo obtener el departamento: {str(e)}")
+        finally:
+            if conn:
+                db.return_connection(conn)
