@@ -127,12 +127,12 @@ class NominaCRUD:
                 id_nomina = cur.fetchone()[0]
                 conn.commit()
 
-                # Obtener nómina completa para respuesta
-                cur.execute("""SELECT * FROM recibo_sueldo WHERE id_nomina=%s""", (id_nomina,))
+                # Obtener nómina directamente desde la tabla base
+                cur.execute("""SELECT * FROM nomina WHERE id_nomina=%s""", (id_nomina,))
                 row = cur.fetchone()
 
                 if not row:
-                    raise ValueError(f"No se encontró la nómina con ID {id_nomina}")
+                    raise ValueError(f"No se encontró la nómina recién insertada con ID {id_nomina}")
 
                 columns = [desc[0] for desc in cur.description]
                 nomina_completa = dict(zip(columns, row))
