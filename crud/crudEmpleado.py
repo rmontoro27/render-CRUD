@@ -216,6 +216,7 @@ class Empleado:
         Raises:
             ValueError: Si hay error en los datos o en la operación
         """
+        conn = None
         try:
             conn = db.get_connection()
             cur = conn.cursor()
