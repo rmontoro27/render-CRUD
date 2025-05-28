@@ -292,44 +292,48 @@ class Empleado:
 
 
 
+
         except ValueError as e:
 
-            try:
+            if conn:
 
-                if conn and not conn.closed:
+                try:
+
                     conn.rollback()
 
-            except Exception:
+                except:
 
-                pass
+                    pass
 
             raise e
 
 
         except Exception as e:
 
-            try:
+            if conn:
 
-                if conn and not conn.closed:
+                try:
+
                     conn.rollback()
 
-            except Exception:
+                except:
 
-                pass
+                    pass
 
             raise ValueError(f"Error al actualizar datos: {str(e)}")
 
 
         finally:
 
-            try:
+            if conn:
 
-                if conn and not conn.closed:
+                try:
+
                     db.return_connection(conn)
 
-            except Exception:
+                except:
 
-                pass
+                    pass
 
 
 class RegistroHorario:
