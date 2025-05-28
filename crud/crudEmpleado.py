@@ -289,14 +289,23 @@ class Empleado:
             return Empleado.obtener_por_id(id_empleado)
 
         except ValueError as e:
-            conn.rollback()
-            raise e
-        except Exception as e:
-            conn.rollback()
-            raise ValueError(f"Error al actualizar datos del empleado: {str(e)}")
-        finally:
+
             if conn:
-                db.return_connection(conn)
+                conn.rollback()  # Usar la conexión obtenida
+
+            raise e
+
+        except Exception as e:
+
+            if conn:
+                conn.rollback()  # Usar la conexión obtenida
+
+            raise ValueError(f"Error al actualizar datos del empleado: {str(e)}")
+
+        finally:
+
+            if conn:
+                db.return_connection(conn)  # Devolver la conexión al pool
 
 
 class RegistroHorario:
