@@ -137,6 +137,15 @@ class NominaCRUD:
                 columns = [desc[0] for desc in cur.description]
                 nomina_completa = dict(zip(columns, row))
 
+                cur.execute("""
+                    SELECT p.periodo_texto
+                    FROM periodo_empleado p
+                    WHERE p.id_periodo = %s
+                """, (id_periodo,))
+                periodo_row = cur.fetchone()
+                if periodo_row:
+                    nomina_completa['periodo'] = periodo_row[0]
+
                 return nomina_completa
 
             except psycopg2.Error as e:
