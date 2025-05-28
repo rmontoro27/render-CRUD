@@ -291,27 +291,45 @@ class Empleado:
             return Empleado.obtener_por_id(id_empleado)
 
 
+
         except ValueError as e:
 
             try:
 
-                if conn:
+                if conn and not conn.closed:
                     conn.rollback()
 
-            except NameError:
+            except Exception:
 
                 pass
 
             raise e
 
+
         except Exception as e:
-            if conn:
-                conn.rollback()
+
+            try:
+
+                if conn and not conn.closed:
+                    conn.rollback()
+
+            except Exception:
+
+                pass
+
             raise ValueError(f"Error al actualizar datos: {str(e)}")
 
+
         finally:
-            if conn:
-                db.return_connection(conn)
+
+            try:
+
+                if conn and not conn.closed:
+                    db.return_connection(conn)
+
+            except Exception:
+
+                pass
 
 
 class RegistroHorario:
