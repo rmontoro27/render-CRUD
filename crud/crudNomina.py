@@ -117,7 +117,7 @@ class NominaCRUD:
                     'Aporte Sindical': 0.02 * salario_base
                 }
 
-                bono_presentismo = 0.0
+                bono_presentismo = 0.833 * salario_base
                 bono_antiguedad = 0.0
                 horas_extra = 0.0
 
