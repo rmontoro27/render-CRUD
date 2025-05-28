@@ -1,7 +1,9 @@
 import uuid
 from datetime import datetime, timedelta, date, time
-from .database import db
+from .database import db, Database
 
+db = Database()  # O como se llame tu clase
+db._initialize_pool()
 
 class Empleado:
     def __init__(self, id_empleado=None, nombre=None, apellido=None, tipo_identificacion=None,
