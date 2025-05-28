@@ -104,7 +104,7 @@ class NominaCRUD:
                     'Obra Social': 0.0,
                     'ANSSAL': 0.0,
                     'Ley 19032': 0.0,
-                    'Ganancias': 0.0,
+                    'Impuesto a las Ganancias': 0.0,
                     'Aporte Sindical': 0.0
                 }
 
@@ -113,7 +113,7 @@ class NominaCRUD:
                     'Obra Social': 0.03 * salario_base,
                     'ANSSAL': 0.01 * salario_base,
                     'Ley 19032': 0.02 * salario_base,
-                    'Ganancias': 0.5 * salario_base,
+                    'Impuesto a las Ganancias': 0.5 * salario_base,
                     'Aporte Sindical': 0.02 * salario_base
                 }
 
@@ -147,7 +147,7 @@ class NominaCRUD:
                     'descuento_obra_social': descuentos_final['Obra Social'],
                     'descuento_anssal': descuentos_final['ANSSAL'],
                     'descuento_ley_19032': descuentos_final['Ley 19032'],
-                    'ganancias': descuentos_final['Ganancias'],
+                    'impuesto_ganancias': descuentos_final['Impuesto a las Ganancias'],
                     'descuento_sindical': descuentos_final['Aporte Sindical'],
                     'sueldo_bruto': sueldo_bruto,
                     'sueldo_neto': sueldo_neto,
