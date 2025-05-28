@@ -57,6 +57,7 @@ class Empleado:
             fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, localidad,
             partido, provincia, genero, pais_nacimiento, estado_civil):
         """Crea un nuevo empleado"""
+        conn = None
         try:
             with db.conn.cursor() as cur:
                 cur.execute(
