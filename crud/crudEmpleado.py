@@ -194,146 +194,89 @@ class Empleado:
             return None
 
     @staticmethod
-    def actualizar_datos_personales(id_empleado: int, telefono: str = None,
-                                    correo_electronico: str = None, calle: str = None,
-                                    numero_calle: str = None, localidad: str = None,
-                                    partido: str = None, provincia: str = None):
+    def actualizar_datos_personales(id_empleado: int,
+                                    telefono: str = None,
+                                    correo_electronico: str = None,
+                                    calle: str = None,
+                                    numero_calle: str = None,
+                                    localidad: str = None,
+                                    partido: str = None,
+                                    provincia: str = None):
         """
-        Permite a un empleado actualizar sus datos personales.
-        Solo actualiza los campos que recibe (los demás permanecen igual).
-
-        Args:
-            id_empleado: ID del empleado que realiza la actualización
-            telefono: Nuevo número de teléfono (opcional)
-            correo_electronico: Nuevo correo electrónico (opcional)
-            calle: Nueva calle (opcional)
-            numero_calle: Nuevo número de calle (opcional)
-            localidad: Nueva localidad (opcional)
-            partido: Nuevo partido (opcional)
-            provincia: Nueva provincia (opcional)
+        Actualiza los datos personales de un empleado. Solo actualiza los campos recibidos.
 
         Returns:
-            El objeto Empleado actualizado
-
-        Raises:
-            ValueError: Si hay error en los datos o en la operación
+            Objeto Empleado actualizado o lanza ValueError
         """
-        conn = None
         try:
             conn = db.get_connection()
             cur = conn.cursor()
 
-            # Construir la consulta dinámicamente basada en los parámetros proporcionados
-            updates = []
-            params = []
-
-            if telefono is not None:
-                updates.append("telefono = %s")
-                params.append(telefono)
-
-            if correo_electronico is not None:
-                # Verificar si el correo ya existe (excepto para este empleado)
-                cur.execute(
-                    "SELECT 1 FROM empleado WHERE correo_electronico = %s AND id_empleado != %s",
-                    (correo_electronico, id_empleado)
-                )
+            # Validar correo electrónico único si se quiere actualizar
+            if correo_electronico:
+                cur.execute("""
+                    SELECT 1 FROM empleado 
+                    WHERE correo_electronico = %s AND id_empleado != %s
+                """, (correo_electronico, id_empleado))
                 if cur.fetchone():
-                    raise ValueError("El correo electrónico ya está en uso por otro empleado")
-                updates.append("correo_electronico = %s")
-                params.append(correo_electronico)
+                    raise ValueError("El correo electrónico ya está en uso por otro empleado.")
 
-            if calle is not None:
-                updates.append("calle = %s")
-                params.append(calle)
-
-            if numero_calle is not None:
-                updates.append("numero_calle = %s")
-                params.append(numero_calle)
-
-            if localidad is not None:
-                updates.append("localidad = %s")
-                params.append(localidad)
-
-            if partido is not None:
-                updates.append("partido = %s")
-                params.append(partido)
-
-            if provincia is not None:
-                # Validar provincia
-                provincias_validas = ['Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
-                                      'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa',
-                                      'La Rioja', 'Mendoza', 'Misiones', 'Neuquén', 'Río Negro',
-                                      'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
-                                      'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
-                                      'Ciudad Autónoma de Buenos Aires']
+            # Validar provincia si se quiere actualizar
+            if provincia:
+                provincias_validas = [
+                    'Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
+                    'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa',
+                    'La Rioja', 'Mendoza', 'Misiones', 'Neuquén', 'Río Negro',
+                    'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
+                    'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
+                    'Ciudad Autónoma de Buenos Aires'
+                ]
                 if provincia not in provincias_validas:
-                    raise ValueError(f"Provincia inválida. Opciones válidas: {provincias_validas}")
-                updates.append("provincia = %s")
-                params.append(provincia)
+                    raise ValueError("Provincia inválida.")
 
-            if not updates:
-                raise ValueError("No se proporcionaron datos para actualizar")
+            # Armar consulta dinámica
+            campos = []
+            valores = []
 
-            # Construir la consulta final
+            if telefono: campos.append("telefono = %s"); valores.append(telefono)
+            if correo_electronico: campos.append("correo_electronico = %s"); valores.append(correo_electronico)
+            if calle: campos.append("calle = %s"); valores.append(calle)
+            if numero_calle: campos.append("numero_calle = %s"); valores.append(numero_calle)
+            if localidad: campos.append("localidad = %s"); valores.append(localidad)
+            if partido: campos.append("partido = %s"); valores.append(partido)
+            if provincia: campos.append("provincia = %s"); valores.append(provincia)
+
+            if not campos:
+                raise ValueError("No se proporcionaron datos para actualizar.")
+
+            # Ejecutar update
             query = f"""
-                UPDATE empleado 
-                SET {', '.join(updates)}
+                UPDATE empleado
+                SET {', '.join(campos)}
                 WHERE id_empleado = %s
                 RETURNING id_empleado
             """
-            params.append(id_empleado)
+            valores.append(id_empleado)
 
-            cur.execute(query, params)
+            cur.execute(query, valores)
             if cur.rowcount == 0:
-                raise ValueError("No se encontró el empleado con el ID proporcionado")
+                raise ValueError("No se encontró el empleado con ese ID.")
 
             conn.commit()
             return Empleado.obtener_por_id(id_empleado)
 
-
-
-
-        except ValueError as e:
-
-            if conn:
-
-                try:
-
-                    conn.rollback()
-
-                except:
-
-                    pass
-
-            raise e
-
-
         except Exception as e:
-
-            if conn:
-
-                try:
-
-                    conn.rollback()
-
-                except:
-
-                    pass
-
+            try:
+                conn.rollback()
+            except:
+                pass
             raise ValueError(f"Error al actualizar datos: {str(e)}")
 
-
         finally:
-
-            if conn:
-
-                try:
-
-                    db.return_connection(conn)
-
-                except:
-
-                    pass
+            try:
+                db.return_connection(conn)
+            except:
+                pass
 
 
 class RegistroHorario:
