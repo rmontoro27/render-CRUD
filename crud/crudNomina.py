@@ -142,7 +142,7 @@ class NominaCRUD:
                     'salario_base': salario_base,
                     'bono_presentismo': bono_presentismo_val,
                     'bono_antiguedad': bono_antiguedad_val,
-                    'horas_extra': horas_extra_val,
+                    'horas_extra': monto_horas_extra,
                     'descuento_jubilacion': descuentos_final['Jubilación'],
                     'descuento_obra_social': descuentos_final['Obra Social'],
                     'descuento_anssal': descuentos_final['ANSSAL'],
