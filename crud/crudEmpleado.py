@@ -290,9 +290,18 @@ class Empleado:
             conn.commit()
             return Empleado.obtener_por_id(id_empleado)
 
+
         except ValueError as e:
-            if conn:
-                conn.rollback()
+
+            try:
+
+                if conn:
+                    conn.rollback()
+
+            except NameError:
+
+                pass
+
             raise e
 
         except Exception as e:
