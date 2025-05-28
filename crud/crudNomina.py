@@ -24,17 +24,18 @@ class NominaCRUD:
                 fecha_calculo_dt = datetime.strptime(fecha_calculo, '%Y-%m-%d').date()
                 fecha_de_pago = fecha_calculo_dt + timedelta(days=7)
 
-                # Obtener id_periodo (MOVIMOS ESTA PARTE AL PRINCIPIO)
-                cur.execute(
-                    "SELECT id_periodo FROM periodo_empleado WHERE id_empleado=%s AND periodo_texto=%s",
-
-                    (id_empleado, periodo_texto)
-                )
+                # Obtener id_periodo
+                cur.execute("""
+                    SELECT id_periodo, presentismo 
+                    FROM periodo_empleado 
+                    WHERE id_empleado = %s AND periodo_texto = %s
+                """, (id_empleado, periodo_texto))
                 periodo_result = cur.fetchone()
 
                 if not periodo_result:
                     raise ValueError("Período no encontrado para el empleado")
-                id_periodo = periodo_result[0]
+
+                id_periodo, tiene_presentismo = periodo_result
 
                 # ELIMINAMOS EL INSERT PREMATURO QUE ESTABA AQUÍ
 
@@ -117,7 +118,7 @@ class NominaCRUD:
                     'Aporte Sindical': 0.02 * salario_base
                 }
 
-                bono_presentismo = 0.833 * salario_base
+                bono_presentismo = 0.833 * salario_base if tiene_presentismo else 0.0
                 bono_antiguedad = 0.0
                 horas_extra = 0.0
 
