@@ -59,31 +59,32 @@ class NominaCRUD:
                 cur.execute("""
                     SELECT SUM(rj.horas_normales_trabajadas)
                     FROM registro_jornada rj
-                    WHERE rj.id_periodo = %s
-                """, (id_periodo,))
+                    WHERE rj.id_periodo = %s AND rj.id_empleado = %s
+                """, (id_periodo, id_empleado))
                 horas_normales_result = cur.fetchone()
                 horas_normales_trabajadas = horas_normales_result[0] or 0
 
                 if horas_normales_trabajadas == 0:
                     raise ValueError("No se registraron horas normales trabajadas en el período")
 
-                # 2. Calcular valor hora (redondeado a 2 decimales)
+                #  Calcular valor hora (redondeado a 2 decimales)
                 valor_hora = round(salario_base / horas_normales_trabajadas, 2)
 
-                # 3. Actualizar tabla periodo_empleado con el valor_hora
+                # Actualizar tabla periodo_empleado con el valor_hora
                 cur.execute("""
                     UPDATE periodo_empleado
                     SET valor_hora = %s
                     WHERE id_periodo = %s
                 """, (valor_hora, id_periodo))
 
-                # 4. Calcular monto de horas extras
+                #  Calcular monto de horas extras
                 cur.execute("""
                     SELECT rhe.cantidad_horas, rhe.tipo_hora_extra
                     FROM registro_hora_extra rhe
                     JOIN registro_jornada rj ON rj.id_registro_jornada = rhe.id_registro_jornada
-                    WHERE rj.id_periodo = %s
-                """, (id_periodo,))
+                    WHERE rj.id_periodo = %s AND rj.id_empleado = %s
+                """, (id_periodo, id_empleado))
+                horas_extra_rows = cur.fetchall()
 
                 horas_extra_rows = cur.fetchall()
                 monto_horas_extra = 0.0
