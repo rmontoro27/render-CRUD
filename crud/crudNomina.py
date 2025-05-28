@@ -59,8 +59,8 @@ class NominaCRUD:
                 cur.execute("""
                     SELECT SUM(rj.horas_normales_trabajadas)
                     FROM registro_jornada rj
-                    WHERE rj.id_periodo = %s AND rj.id_empleado = %s
-                """, (id_periodo, id_empleado))
+                    WHERE rj.id_periodo = %s
+                """, (id_periodo,))
                 horas_normales_result = cur.fetchone()
                 horas_normales_trabajadas = horas_normales_result[0] or 0
 
@@ -82,9 +82,8 @@ class NominaCRUD:
                     SELECT rhe.cantidad_horas, rhe.tipo_hora_extra
                     FROM registro_hora_extra rhe
                     JOIN registro_jornada rj ON rj.id_registro_jornada = rhe.id_registro_jornada
-                    WHERE rj.id_periodo = %s AND rj.id_empleado = %s
-                """, (id_periodo, id_empleado))
-                horas_extra_rows = cur.fetchall()
+                    WHERE rj.id_periodo = %s
+                """, (id_periodo,))
 
                 horas_extra_rows = cur.fetchall()
                 monto_horas_extra = 0.0
