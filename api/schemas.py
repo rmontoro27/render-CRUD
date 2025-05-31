@@ -82,3 +82,26 @@ class EmpleadoNominaRequest(BaseModel):
 
 class EmpleadoConsulta(BaseModel):
     numero_identificacion: str
+
+class EmpleadoIDRequest(BaseModel):
+    empleado_id: str
+
+class EmpleadoPeriodoRequest(BaseModel):
+    empleado_id: str
+    año: Optional[int] = None
+    mes: Optional[int] = None
+
+class HorasRequest(BaseModel):
+    empleado_id: str
+    año: int
+    mes: int
+
+class BuscarEmpleadoRequest(BaseModel):
+    nombre: Optional[str] = None
+    apellido: Optional[str] = None
+    dni: Optional[str] = None
+    pagina: int = 1
+    por_pagina: int = 10
+
+class EmpleadoIDIntRequest(BaseModel):
+    empleado_id: int

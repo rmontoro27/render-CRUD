@@ -19,7 +19,9 @@ from pydantic import BaseModel, Field
 from typing import List
 from typing import Tuple, List
 from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResponse,
-                      NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta)
+                      NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta,
+                      EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
+                      BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -321,6 +323,56 @@ def obtener_informacion_laboral(empleado_id: int):
         raise HTTPException(status_code=404, detail="No encontrado")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+# --- POST Endpoints ---
+@app.post("/registros/")
+def obtener_registros_post(request: EmpleadoPeriodoRequest):
+    if request.año and request.mes:
+        registros = RegistroHorario.obtener_registros_mensuales(request.empleado_id, request.año, request.mes)
+    else:
+        registros = RegistroHorario.obtener_todos_los_registros(request.empleado_id)
+    return [r for r in registros]
+
+@app.post("/registroscompleto/")
+def obtener_registros_completo_post(request: EmpleadoIDRequest):
+    registros = RegistroHorario.obtener_todos_los_registros(request.empleado_id)
+    return [r for r in registros]
+
+@app.post("/horas/")
+def calcular_horas_post(request: HorasRequest):
+    horas = RegistroHorario.calcular_horas_mensuales(request.empleado_id, request.año, request.mes)
+    return {"horas_trabajadas": horas}
+
+@app.post("/empleados/listar")
+def listar_empleados_post():
+    try:
+        empleados = AdminCRUD.obtener_empleado()
+        return [e for e in empleados]
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/empleados/buscar/")
+def buscar_empleados_post(request: BuscarEmpleadoRequest):
+    return AdminCRUD.buscar_avanzado(request.nombre, request.apellido, request.dni, request.pagina, request.por_pagina)
+
+@app.post("/empleados/informacion-laboral")
+def obtener_info_laboral_post(request: EmpleadoIDIntRequest):
+    try:
+        info = AdminCRUD.buscar_informacion_laboral_por_id_empleado(request.empleado_id)
+        if info:
+            return {
+                "departamento": info[0],
+                "puesto": info[1],
+                "turno": info[2],
+                "horario_entrada": str(info[3]),
+                "horario_salida": str(info[4]),
+                "fecha_ingreso": info[5].strftime('%Y-%m-%d'),
+                "tipo_contrato": info[6]
+            }
+        raise HTTPException(status_code=404, detail="No encontrado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 #NOMINAS----------------------------------------------------------------------------------------
 
