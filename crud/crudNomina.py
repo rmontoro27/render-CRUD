@@ -221,6 +221,7 @@ class NominaCRUD:
             if conn:
                 self.db.return_connection(conn)
 
+    @staticmethod
     def obtener_nominas_empleado(self, id_empleado: int) -> List[NominaResponse]:
         """Devuelve todas las nóminas del empleado como Pydantic models"""
         conn = None

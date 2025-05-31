@@ -397,6 +397,14 @@ async def obtener_nominas_empleado(id_empleado: int):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# POST para obtener las nóminas de un empleado
+@app.post("/nominas/empleado", response_model=NominaListResponse)
+async def obtener_nominas_empleado_post(data: EmpleadoIDRequest):
+    try:
+        nominas = NominaCRUD.obtener_nominas_empleado(data.id_empleado)
+        return {"nominas": nominas}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.post("/nominas/empleado/buscar", response_model=NominaListResponse)
 async def buscar_nominas_empleado(
