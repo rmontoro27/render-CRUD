@@ -79,3 +79,6 @@ class CalculoNominaRequest(BaseModel):
 class EmpleadoNominaRequest(BaseModel):
     id_empleado: int
     periodo: Optional[str] = None
+
+class EmpleadoConsulta(BaseModel):
+    numero_identificacion: str

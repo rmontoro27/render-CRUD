@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 from typing import List
 from typing import Tuple, List
 from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResponse,
-                      NominaBase, NominaListResponse, EmpleadoNominaRequest)
+                      NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -178,6 +178,15 @@ def obtener_empleado(numero_identificacion: str):
   #      return registro
    # except ValueError as e:
     #    raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/obtener-empleado")
+def obtener_empleado(data: EmpleadoConsulta):
+    empleado = AdminCRUD.obtener_detalle_empleado(data.numero_identificacion)
+    if not empleado:
+        return {"mensaje": "Empleado no encontrado"}
+    return empleado
+
+
 @app.delete("/empleados/{id_empleado}", status_code=status.HTTP_204_NO_CONTENT)
 async def borrar_empleado(
         id_empleado: int,
