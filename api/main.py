@@ -399,7 +399,7 @@ async def obtener_nominas_empleado(id_empleado: int):
 
 # POST para obtener las nóminas de un empleado
 @app.post("/nominas/empleado", response_model=NominaListResponse)
-async def obtener_nominas_empleado_post(data: EmpleadoIDRequest):
+async def obtener_nominas_empleado_post(data: EmpleadoIDIntRequest):
     try:
         nominas = NominaCRUD.obtener_nominas_empleado(data.id_empleado)
         return {"nominas": nominas}
