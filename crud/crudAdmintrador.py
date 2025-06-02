@@ -671,17 +671,8 @@ class AdminCRUD:
 
             conn.commit()
             return Empleado.obtener_por_id(id_empleado)
-
-        except ValueError as e:
-            if conn:
-                conn.rollback()
-            raise e
-
         except Exception as e:
             if conn:
                 conn.rollback()
             raise ValueError(f"Error al actualizar datos: {str(e)}")
 
-        finally:
-            if conn:
-                db.return_connection(conn)

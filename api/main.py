@@ -249,7 +249,7 @@ def actualizar_datos_empleado(
     # Agregar autenticación para que solo el empleado o admin pueda actualizar
 ):
     try:
-        empleado_actualizado = Empleado.actualizar_datos_personales(
+        empleado_actualizado = AdminCRUD.actualizar_datos_personales2(
             id_empleado=empleado_id,
             telefono=datos.telefono,
             correo_electronico=datos.correo_electronico,
