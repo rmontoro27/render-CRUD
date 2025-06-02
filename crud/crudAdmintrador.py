@@ -600,7 +600,7 @@ class AdminCRUD:
         Raises:
             ValueError: Si hay error en los datos o en la operación
         """
-        conn = None
+
         try:
             conn = db.get_connection()
             cur = conn.cursor()
@@ -671,8 +671,7 @@ class AdminCRUD:
 
             conn.commit()
             return Empleado.obtener_por_id(id_empleado)
-        except Exception as e:
+        finally:
             if conn:
-                conn.rollback()
-            raise ValueError(f"Error al actualizar datos: {str(e)}")
+                db.return_connection(conn)
 
