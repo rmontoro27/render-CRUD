@@ -574,7 +574,6 @@ class AdminCRUD:
                 db.return_connection(conn)
 
 
-
     @staticmethod
     def actualizar_datos_personales2(id_empleado: int, telefono: str = None,
                                     correo_electronico: str = None, calle: str = None,
@@ -600,7 +599,7 @@ class AdminCRUD:
         Raises:
             ValueError: Si hay error en los datos o en la operación
         """
-
+        conn = None
         try:
             conn = db.get_connection()
             cur = conn.cursor()
@@ -674,4 +673,8 @@ class AdminCRUD:
         finally:
             if conn:
                 db.return_connection(conn)
+
+
+
+
 
