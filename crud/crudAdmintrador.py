@@ -672,7 +672,7 @@ class AdminCRUD:
             return Empleado.obtener_por_id(id_empleado)
         finally:
             if conn:
-                db.return_connection(conn)
+                conn.close()
 
 
 
