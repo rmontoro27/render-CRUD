@@ -667,7 +667,7 @@ class AdminCRUD:
             cur.execute(query, params)
             if cur.rowcount == 0:
                 raise ValueError("No se encontró el empleado con el ID proporcionado")
-
+            print(f"[DEBUG] Tipo de conn: {type(conn)}")
             conn.commit()
             return Empleado.obtener_por_id(id_empleado)
         finally:
