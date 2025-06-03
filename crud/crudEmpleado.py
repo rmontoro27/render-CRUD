@@ -99,38 +99,50 @@ class Empleado:
     @staticmethod
     def obtener_por_id(id_empleado):
         """Obtiene un empleado por su ID"""
-        with db.conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion, 
-                    fecha_nacimiento, correo_electronico, telefono, calle, numero_calle, 
-                    localidad, partido, provincia, genero, pais_nacimiento, estado_civil
-                FROM empleado
-                WHERE id_empleado = %s
-                """,
-                (str(id_empleado),)
-            )
-            result = cur.fetchone()
-            if result:
-                return Empleado(
-                    id_empleado=result[0],
-                    nombre=result[1],
-                    apellido=result[2],
-                    tipo_identificacion=result[3],
-                    numero_identificacion=result[4],
-                    fecha_nacimiento=result[5],
-                    correo_electronico=result[6],
-                    telefono=result[7],
-                    calle=result[8],
-                    numero_calle=result[9],
-                    localidad=result[10],
-                    partido=result[11],
-                    provincia=result[12],
-                    genero=result[13],
-                    pais_nacimiento=result[14],
-                    estado_civil=result[15]
+        conn = None
+        try:
+            conn = db.get_connection()
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT id_empleado, nombre, apellido, tipo_identificacion, 
+                           numero_identificacion, fecha_nacimiento, correo_electronico, 
+                           telefono, calle, numero_calle, localidad, partido, provincia, 
+                           genero, pais_nacimiento, estado_civil
+                    FROM empleado
+                    WHERE id_empleado = %s
+                    """,
+                    (str(id_empleado),)
                 )
-            return None  # En caso de no encontrar
+                result = cur.fetchone()
+
+                if result:
+                    return Empleado(
+                        id_empleado=result[0],
+                        nombre=result[1],
+                        apellido=result[2],
+                        tipo_identificacion=result[3],
+                        numero_identificacion=result[4],
+                        fecha_nacimiento=result[5],
+                        correo_electronico=result[6],
+                        telefono=result[7],
+                        calle=result[8],
+                        numero_calle=result[9],
+                        localidad=result[10],
+                        partido=result[11],
+                        provincia=result[12],
+                        genero=result[13],
+                        pais_nacimiento=result[14],
+                        estado_civil=result[15]
+                    )
+                return None
+        except Exception as e:
+            print(f"Error al obtener empleado: {e}")
+            return None
+        finally:
+            if conn:
+                db.return_connection(conn)
+
 
     @staticmethod
     def borrar_por_id(id_empleado):
