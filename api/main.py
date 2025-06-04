@@ -6,6 +6,8 @@ from pydantic import field_validator
 import numpy as np
 
 from fastapi import FastAPI, HTTPException, Depends
+
+from auth.jwt import crear_token
 from crud import crudEmpleado, crudAdmintrador
 import uuid
 from typing import Optional
@@ -21,7 +23,8 @@ from typing import Tuple, List
 from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResponse,
                       NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta,
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
-                      BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest)
+                      BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
+                      LoginRequest, RegistroUpdate)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -230,7 +233,7 @@ def obtener_registros(
     return [r for r in registros]
 
 @app.get("/registroscompleto/{empleado_id}")
-def obtener_registros(empleado_id: str):
+def obtener_todos_los_registros(empleado_id: str):
 
     registros = RegistroHorario.obtener_todos_los_registros(empleado_id)
     return [r for r in registros]
@@ -324,7 +327,7 @@ def obtener_informacion_laboral(empleado_id: int):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# --- POST Endpoints ---
+# --- POST Endpoints -----------------------------------------
 @app.post("/registros/")
 def obtener_registros_post(request: EmpleadoPeriodoRequest):
     if request.año and request.mes:
@@ -372,6 +375,76 @@ def obtener_info_laboral_post(request: EmpleadoIDIntRequest):
         raise HTTPException(status_code=404, detail="No encontrado")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+#VERSIONES PUT CRUD DE EMPLEADOS------------------------------------------------------------------
+
+
+@app.put("/registros/{registro_id}")
+async def actualizar_registro_horario(
+    registro_id: int,
+    registro: RegistroUpdate,
+    # current_user: dict = Depends(verificar_admin)
+):
+    """
+    Actualiza un registro horario existente.
+    """
+    try:
+        registro_actualizado = RegistroHorario.actualizar_registro(
+            registro_id=registro_id,
+            nuevos_datos=registro
+        )
+        if not registro_actualizado:
+            raise HTTPException(
+                status_code=404,
+                detail="Registro no encontrado"
+            )
+        return registro_actualizado
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.patch("/empleados/{empleado_id}/datos-personales", response_model=EmpleadoBase)
+async def actualizar_datos_personales(
+        empleado_id: int,
+        datos: EmpleadoUpdate
+):
+    """
+    Endpoint PATCH que utiliza tu función actualizar_datos_personales2
+    """
+    try:
+        # Extraer solo los campos que no son None
+        campos_actualizar = {k: v for k, v in datos.dict().items() if v is not None}
+
+        if not campos_actualizar:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No se proporcionaron datos para actualizar"
+            )
+
+        # Llamada a tu función CRUD existente
+        empleado_actualizado = AdminCRUD.actualizar_datos_personales2(
+            id_empleado=empleado_id,
+            **campos_actualizar
+        )
+
+        if not empleado_actualizado:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Empleado no encontrado"
+            )
+
+        return empleado_actualizado
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error interno del servidor: {str(e)}"
+        )
 
 
 #NOMINAS----------------------------------------------------------------------------------------
@@ -488,3 +561,20 @@ def obtener_departamento_empleado(empleado_id: int):
         raise HTTPException(status_code=404, detail="Departamento no encontrado para el empleado especificado")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+#Login--------------------------------------------------------------
+
+#@app.post("/login", response_model=LoginResponse)
+#def login(request: LoginRequest):
+#    usuario = AdminCRUD.obtener_usuario_por_username(request.username)
+#    if not usuario or not verificar_password(request.password, usuario.password_hash):
+#        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+
+#    token = crear_token({
+ #       "sub": usuario.username,
+  #      "id_empleado": usuario.id_empleado,
+   #     "rol": usuario.rol
+#    })
+
+#    return {"access_token": token, "rol": usuario.rol}
+

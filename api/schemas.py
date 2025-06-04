@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional, List
-from datetime import date
+from datetime import date, time
 
 class EmpleadoResponse(BaseModel):
     """Modelo SOLO para respuestas (GET)"""
@@ -105,3 +105,21 @@ class BuscarEmpleadoRequest(BaseModel):
 
 class EmpleadoIDIntRequest(BaseModel):
     empleado_id: int
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    rol: str
+
+class RegistroUpdate(BaseModel):
+    tipo: Optional[str] = None
+    fecha: Optional[date] = None
+    hora: Optional[time] = None
+    estado_asistencia: Optional[str] = None
+    turno_asistencia: Optional[str] = None
+    puesto_del_asistente: Optional[str] = None
+    vector_capturado: Optional[str] = None

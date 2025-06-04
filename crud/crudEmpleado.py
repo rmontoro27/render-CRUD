@@ -665,6 +665,94 @@ class RegistroHorario:
             if conn:
                 db.return_connection(conn)
 
+    @staticmethod
+    def actualizar_registro(registro_id: int, nuevos_datos: dict):
+        """
+        Actualiza un registro de asistencia existente
+
+        Args:
+            registro_id: ID del registro a actualizar
+            nuevos_datos: Diccionario con campos a actualizar
+
+        Returns:
+            RegistroHorario: El registro actualizado
+
+        Raises:
+            ValueError: Si hay errores en los datos
+        """
+        try:
+            with db.conn.cursor() as cur:
+                # 1. Validar campos permitidos
+                campos_permitidos = {
+                    'tipo', 'fecha', 'hora', 'estado_asistencia',
+                    'turno_asistencia', 'puesto_del_asistente', 'vector_capturado'
+                }
+
+                updates = []
+                params = []
+
+                for campo, valor in nuevos_datos.items():
+                    if campo not in campos_permitidos:
+                        raise ValueError(f"Campo no permitido para actualización: {campo}")
+
+                    updates.append(f"{campo} = %s")
+                    params.append(valor)
+
+                if not updates:
+                    raise ValueError("No se proporcionaron datos válidos para actualizar")
+
+                # 2. Obtener registro actual para validaciones
+                cur.execute(
+                    "SELECT tipo, fecha, hora, id_empleado FROM asistencia_biometrica WHERE id_asistencia_biometrica = %s",
+                    (registro_id,)
+                )
+                registro_actual = cur.fetchone()
+
+                if not registro_actual:
+                    raise ValueError("Registro no encontrado")
+
+                tipo_actual, fecha_actual, hora_actual, id_empleado = registro_actual
+
+                # 3. Validaciones específicas
+                if 'tipo' in nuevos_datos and nuevos_datos['tipo'] not in ['Entrada', 'Salida']:
+                    raise ValueError("El tipo debe ser 'Entrada' o 'Salida'")
+
+                if 'hora' in nuevos_datos:
+                    # Validar coherencia con información laboral si se cambia la hora
+                    cur.execute(
+                        "SELECT hora_inicio_turno, hora_fin_turno FROM informacion_laboral WHERE id_empleado = %s",
+                        (id_empleado,)
+                    )
+                    turno_info = cur.fetchone()
+
+                    if turno_info:
+                        hora_inicio, hora_fin = turno_info
+                        # Aquí podrías añadir lógica similar a registrar_asistencia
+                        # para recalcular estado_asistencia si cambia la hora
+
+                # 4. Ejecutar actualización
+                query = f"""
+                    UPDATE asistencia_biometrica
+                    SET {', '.join(updates)}
+                    WHERE id_asistencia_biometrica = %s
+                    RETURNING id_asistencia_biometrica, id_empleado, tipo, fecha, hora,
+                              estado_asistencia, turno_asistencia, puesto_del_asistente, vector_capturado
+                """
+                params.append(registro_id)
+
+                cur.execute(query, params)
+                resultado = cur.fetchone()
+
+                if not resultado:
+                    raise ValueError("No se pudo actualizar el registro")
+
+                db.conn.commit()
+                return RegistroHorario(*resultado)
+
+        except Exception as e:
+            db.conn.rollback()
+            raise ValueError(f"Error al actualizar registro: {str(e)}")
+
 
 
 
