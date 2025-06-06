@@ -458,8 +458,8 @@ cloudinary.config(
     api_secret=os.getenv("47PafwZ4aSgVEg8eGWsyacM7QP0"),
 )
 
-@app.post("/upload-image/")
-async def upload_image(image: UploadFile = File(...), usuario_id: str = Form(...)):
+@app.post("/cargar-image/")
+async def cargar_imagen(image: UploadFile = File(...), usuario_id: str = Form(...)):
     contents = await image.read()
     image_url = AdminCRUD.actualizar_imagen_perfil(contents, usuario_id)
     return {"url": image_url}
