@@ -31,6 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException, status
 import cloudinary
 import cloudinary.uploader
+from fastapi import UploadFile, File, Form
 
 
 
@@ -177,7 +178,7 @@ def obtener_empleado(numero_identificacion: str):
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
     return empleado
 
-# No puedo probarlo porque no hay registros laborales
+# No puedo probarlo porque no hay hs laborales
 #@app.post("/registros/")
 #def registrar_horario(empleado_id: str, vectorBiometrico: str):
 #    try:
@@ -450,11 +451,18 @@ async def actualizar_datos_personales(
 
 #FOTO-------------------------------------------------------------------------------------------
 
+
 cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    cloud_name=os.getenv("dgl2tcayr"),
+    api_key=os.getenv("519574358682122"),
+    api_secret=os.getenv("47PafwZ4aSgVEg8eGWsyacM7QP0"),
 )
+
+@app.post("/upload-image/")
+async def upload_image(image: UploadFile = File(...), usuario_id: str = Form(...)):
+    contents = await image.read()
+    image_url = AdminCRUD.actualizar_imagen_perfil(contents, usuario_id)
+    return {"url": image_url}
 
 
 #NOMINAS----------------------------------------------------------------------------------------

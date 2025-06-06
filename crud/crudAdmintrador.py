@@ -6,6 +6,9 @@ from .crudEmpleado import Empleado
 from typing import Optional
 from typing import Tuple, List
 from api.schemas import EmpleadoResponse
+import cloudinary
+import cloudinary.uploader
+from cloudinary.uploader import upload as cloudinary_upload
 
 
 class AdminCRUD:
@@ -157,7 +160,7 @@ class AdminCRUD:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT id_empleado, numero_identificacion, nombre, apellido, correo_electronico, telefono
+                SELECT id_empleado, numero_identificacion, nombre, apellido, correo_electronico, telefono, imagen_perfil_url
                 FROM empleado
                 ORDER BY apellido, nombre
                 """
@@ -676,7 +679,42 @@ class AdminCRUD:
 
 
 
+    @staticmethod
+    def actualizar_imagen_perfil(id_empleado: int, image_bytes: bytes) -> str:
+        """
+        Sube una imagen a Cloudinary y actualiza la URL de perfil del empleado.
 
+        Args:
+            id_empleado: ID del empleado.
+            image_bytes: Contenido de la imagen en bytes.
+
+        Returns:
+            La URL segura de la imagen subida.
+
+        Raises:
+            ValueError: Si no se puede actualizar o si el empleado no existe.
+        """
+        conn = None
+        try:
+            # Subir a Cloudinary
+            result = cloudinary_upload(image_bytes, folder="perfiles")
+            image_url = result["secure_url"]
+
+            # Conexión a BD
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE empleado SET imagen_perfil_url = %s WHERE id_empleado = %s RETURNING id_empleado",
+                (image_url, id_empleado)
+            )
+            if cur.rowcount == 0:
+                raise ValueError("Empleado no encontrado")
+            conn.commit()
+
+            return image_url
+        finally:
+            if conn:
+                conn.close()
 
 
 

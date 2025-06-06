@@ -1,6 +1,9 @@
 import uuid
 from datetime import datetime, timedelta, date, time
 from .database import db, Database
+import cloudinary
+import cloudinary.uploader
+import psycopg2
 
 db = Database()  # O como se llame tu clase
 db._initialize_pool()
@@ -289,6 +292,8 @@ class Empleado:
                 db.return_connection(conn)
             except:
                 pass
+
+
 
 
 class RegistroHorario:
@@ -752,6 +757,8 @@ class RegistroHorario:
         except Exception as e:
             db.conn.rollback()
             raise ValueError(f"Error al actualizar registro: {str(e)}")
+
+
 
 
 
