@@ -627,7 +627,7 @@ class RegistroHorario:
             cur = conn.cursor()
             cur.execute(
                 """
-                SELECT fecha,  dia, hora_entrada, hora_salida, horas_normales_trabajadas, estado_jornada
+                SELECT fecha,  dia, hora_entrada, hora_salida, horas_normales_trabajadas, horas_extras, estado_jornada
                 FROM calendario
                 WHERE id_empleado = %s
                 ORDER BY fecha
