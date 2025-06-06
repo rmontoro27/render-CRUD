@@ -21,3 +21,4 @@ uvicorn==0.34.2
 
 passlib==1.7.4
 python-jose==3.3.0
+cloudinary==1.37.0
