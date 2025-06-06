@@ -453,9 +453,9 @@ async def actualizar_datos_personales(
 
 
 cloudinary.config(
-    cloud_name=os.getenv("dgl2tcayr"),
-    api_key=os.getenv("519574358682122"),
-    api_secret=os.getenv("47PafwZ4aSgVEg8eGWsyacM7QP0"),
+    cloud_name="dgl2tcayr",
+    api_key="519574358682122",
+    api_secret="47PafwZ4aSgVEg8eGWsyacM7QP0"
 )
 
 @app.post("/cargar-image/")
