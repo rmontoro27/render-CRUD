@@ -29,6 +29,8 @@ from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException, status
+import cloudinary
+import cloudinary.uploader
 
 
 
@@ -445,6 +447,14 @@ async def actualizar_datos_personales(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error interno del servidor: {str(e)}"
         )
+
+#FOTO-------------------------------------------------------------------------------------------
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+)
 
 
 #NOMINAS----------------------------------------------------------------------------------------
