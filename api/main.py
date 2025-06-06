@@ -460,10 +460,18 @@ cloudinary.config(
 
 @app.post("/cargar-image/")
 async def cargar_imagen(image: UploadFile = File(...), usuario_id: int = Form(...)):
-    contents = await image.read()
-    image_url = AdminCRUD.actualizar_imagen_perfil(contents, usuario_id)
-    return {"url": image_url}
+    try:
+        contents = await image.read()
 
+        # Debug opcional
+        print(f"Archivo recibido: {image.filename}, tamaño: {len(contents)} bytes")
+
+        image_url = AdminCRUD.actualizar_imagen_perfil(contents, usuario_id)
+        return {"url": image_url}
+
+    except Exception as e:
+        print(f"Error al cargar imagen: {e}")
+        return {"error": str(e)}
 
 #NOMINAS----------------------------------------------------------------------------------------
 

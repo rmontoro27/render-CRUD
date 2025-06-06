@@ -9,6 +9,7 @@ from api.schemas import EmpleadoResponse
 import cloudinary
 import cloudinary.uploader
 from cloudinary.uploader import upload as cloudinary_upload
+import io
 
 
 class AdminCRUD:
@@ -680,41 +681,37 @@ class AdminCRUD:
 
 
     @staticmethod
-    def actualizar_imagen_perfil(id_empleado: int, image_bytes: bytes) -> str:
+    def actualizar_imagen_perfil(image_bytes: bytes, usuario_id: int):
         """
-        Sube una imagen a Cloudinary y actualiza la URL de perfil del empleado.
+        Sube una imagen a Cloudinary y actualiza la URL en la base de datos para el usuario indicado.
 
         Args:
-            id_empleado: ID del empleado.
-            image_bytes: Contenido de la imagen en bytes.
+            image_bytes: El contenido de la imagen en bytes
+            usuario_id: ID del empleado a actualizar
 
         Returns:
-            La URL segura de la imagen subida.
-
-        Raises:
-            ValueError: Si no se puede actualizar o si el empleado no existe.
+            URL segura de la imagen subida
         """
         conn = None
         try:
             # Subir a Cloudinary
-            result = cloudinary_upload(image_bytes, folder="perfiles")
+            result = cloudinary.uploader.upload(io.BytesIO(image_bytes), folder="perfiles")
             image_url = result["secure_url"]
 
-            # Conexión a BD
+            # Guardar en base de datos
             conn = db.get_connection()
             cur = conn.cursor()
             cur.execute(
-                "UPDATE empleado SET imagen_perfil_url = %s WHERE id_empleado = %s RETURNING id_empleado",
-                (image_url, id_empleado)
+                "UPDATE empleado SET imagen_perfil_url = %s WHERE id_empleado = %s",
+                (image_url, usuario_id)
             )
-            if cur.rowcount == 0:
-                raise ValueError("Empleado no encontrado")
             conn.commit()
-
             return image_url
+
+        except Exception as e:
+            raise Exception(f"Error al subir imagen: {e}")
+
         finally:
             if conn:
                 conn.close()
-
-
 
