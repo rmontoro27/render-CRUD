@@ -15,7 +15,7 @@ class Usuario:
 
     @staticmethod
     def crear_usuario(id_empleado: int, id_rol: int, nombre_usuario: str,
-                      contraseña: str, motivo: str = None):
+                      contrasena: str, motivo: str = None):
         conn = None
         try:
             conn = db.get_connection()
@@ -27,7 +27,7 @@ class Usuario:
                 raise ValueError("El nombre de usuario ya está en uso.")
 
             # Hashear la contraseña
-            contraseña_hash = bcrypt.hashpw(contraseña.encode('utf-8'), bcrypt.gensalt())
+            contrasena_hash = bcrypt.hashpw(contrasena.encode('utf-8'), bcrypt.gensalt())
 
             # Insertar el nuevo usuario
             cur.execute("""
@@ -37,7 +37,7 @@ class Usuario:
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING id_usuario
                 """, (
-                id_empleado, id_rol, nombre_usuario, contraseña_hash.decode('utf-8'),
+                id_empleado, id_rol, nombre_usuario, contrasena_hash.decode('utf-8'),
                 True, datetime.utcnow(), datetime.utcnow(), motivo
             ))
 

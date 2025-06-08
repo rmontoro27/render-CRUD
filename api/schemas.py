@@ -128,7 +128,7 @@ class CrearUsuarioRequest(BaseModel):
     id_empleado: int
     id_rol: int
     nombre_usuario: str
-    contraseña: str
+    contrasena: str
     motivo: Optional[str] = None
 
 class Permisos(BaseModel):

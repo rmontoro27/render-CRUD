@@ -600,7 +600,7 @@ def login(request: LoginRequest):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
     # Verificar contraseña
-    if not Usuario.verificar_password(request.password, usuario.contraseña):
+    if not Usuario.verificar_password(request.password, usuario.contrasena):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
     # Verificar si el usuario está activo
@@ -640,7 +640,7 @@ def crear_usuario(request: CrearUsuarioRequest):
             id_empleado=request.id_empleado,
             id_rol=request.id_rol,
             nombre_usuario=request.nombre_usuario,
-            contraseña=request.contraseña,
+            contrasena=request.contrasena,
             motivo=request.motivo
         )
         return {"mensaje": "Usuario creado correctamente", "id_usuario": id_usuario}
