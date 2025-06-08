@@ -595,7 +595,7 @@ def obtener_departamento_empleado(empleado_id: int):
 @app.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest):
     #  Buscar usuario
-    usuario = AdminCRUD.obtener_usuario_por_username(request.username)
+    usuario = Usuario.obtener_usuario_por_username(request.username)
     if not usuario:
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
