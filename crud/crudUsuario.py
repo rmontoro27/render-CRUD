@@ -32,7 +32,7 @@ class Usuario:
             # Insertar el nuevo usuario
             cur.execute("""
                     INSERT INTO usuario (
-                        id_empleado, id_rol, nombre_usuario, contraseña,
+                        id_empleado, id_rol, nombre_usuario, contrasena,
                         esta_activo, fecha_activacion, fecha_creacion, motivo
                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING id_usuario
@@ -87,7 +87,7 @@ class Usuario:
             cur.execute("""
                 SELECT 
                     id_usuario, id_empleado, id_rol, 
-                    nombre_usuario, contraseña AS password_hash,
+                    nombre_usuario, contrasena AS password_hash,
                     esta_activo, fecha_activacion, fecha_creacion, motivo
                 FROM usuario 
                 WHERE nombre_usuario = %s
