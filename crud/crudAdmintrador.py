@@ -614,7 +614,7 @@ class AdminCRUD:
     def obtener_id_rol_por_id_empleado(id_empleado: int):
         conn = db.get_connection()
         cur = conn.cursor()
-        cur.execute("SELECT id_rol FROM empleado WHERE id_empleado = %s", (id_empleado,))
+        cur.execute("SELECT id_rol FROM usuario WHERE id_empleado = %s", (id_empleado,))
         result = cur.fetchone()
         return result[0] if result else None
 
