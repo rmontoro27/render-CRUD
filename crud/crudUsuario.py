@@ -3,7 +3,7 @@ import psycopg2
 
 from.database import db
 from datetime import datetime
-from api.schemas import Permisos
+from api.schemas import Permisos, UsuarioModel
 from fastapi import Depends, HTTPException
 
 
@@ -80,27 +80,30 @@ class Usuario:
         return permisos
 
     @staticmethod
-    def obtener_usuario_por_username(username: str) -> dict | None:
+    def obtener_usuario_por_username(username: str) -> UsuarioModel | None:
         conn = db.get_connection()
         cur = conn.cursor()
-        try:
-            cur.execute("""
-                SELECT 
-                    id_usuario, id_empleado, id_rol, 
-                    nombre_usuario, contrasena AS password_hash,
-                    esta_activo, fecha_activacion, fecha_creacion, motivo
-                FROM usuario 
-                WHERE nombre_usuario = %s
-            """, (username,))
-            row = cur.fetchone()
-            if not row:
-                return None
+        cur.execute("""
+            SELECT 
+                id_usuario, id_empleado, id_rol, nombre_usuario, contrasena, 
+                esta_activo, fecha_activacion, fecha_creacion, motivo
+            FROM usuario 
+            WHERE nombre_usuario = %s
+        """, (username,))
 
-            columns = [desc[0] for desc in cur.description]
-            return dict(zip(columns, row))
-        finally:
-            cur.close()
-            conn.close()
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if not row:
+            return None
+
+        columnas = [
+            "id_usuario", "id_empleado", "id_rol", "nombre_usuario", "contrasena",
+            "esta_activo", "fecha_activacion", "fecha_creacion", "motivo"
+        ]
+        data = dict(zip(columnas, row))
+        return UsuarioModel(**data)
 
     def requiere_permiso(nombre_permiso: str):
         def validador(usuario: Usuario = Depends(Usuario.obtener_usuario_desde_token)):

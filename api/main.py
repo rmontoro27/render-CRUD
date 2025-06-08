@@ -596,11 +596,8 @@ def obtener_departamento_empleado(empleado_id: int):
 def login(request: LoginRequest):
     #  Buscar usuario
     usuario = Usuario.obtener_usuario_por_username(request.username)
-    if not usuario:
-        raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-    # Verificar contraseña
-    if not Usuario.verificar_password(request.password, usuario.contrasena):
+    if not usuario or not Usuario.verificar_password(request.password, usuario.contrasena):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
     # Verificar si el usuario está activo

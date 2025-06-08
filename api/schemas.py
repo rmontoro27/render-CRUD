@@ -131,6 +131,17 @@ class CrearUsuarioRequest(BaseModel):
     contrasena: str
     motivo: Optional[str] = None
 
+class UsuarioModel(BaseModel):
+    id_usuario: int
+    id_empleado: int
+    id_rol: int
+    nombre_usuario: str
+    contrasena: str
+    esta_activo: bool
+    fecha_activacion: str | None  # Usá datetime si ya lo estás manejando así
+    fecha_creacion: str | None
+    motivo: str | None
+
 class Permisos(BaseModel):
     online_login: bool = False
     offline_login: bool = False
