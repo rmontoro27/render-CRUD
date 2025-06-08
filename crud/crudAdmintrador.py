@@ -594,8 +594,8 @@ class AdminCRUD:
             query = """
                     SELECT p.nombre
                     FROM informacion_laboral il
-                    JOIN rol p ON il.id_rol = p.id_rol
-                    WHERE p.il.id_empleado = %s
+                    JOIN rol p ON p.id_rol = p.id_rol
+                    WHERE il.id_empleado = %s
                     ORDER BY il.fecha_ingreso DESC
                     LIMIT 1
                 """
