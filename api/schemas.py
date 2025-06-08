@@ -123,3 +123,10 @@ class RegistroUpdate(BaseModel):
     turno_asistencia: Optional[str] = None
     puesto_del_asistente: Optional[str] = None
     vector_capturado: Optional[str] = None
+
+class CrearUsuarioRequest(BaseModel):
+    id_empleado: int
+    id_rol: int
+    nombre_usuario: str
+    contraseña: str
+    motivo: Optional[str] = None

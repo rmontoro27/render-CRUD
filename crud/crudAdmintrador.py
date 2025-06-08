@@ -577,6 +577,39 @@ class AdminCRUD:
             if conn:
                 db.return_connection(conn)
 
+    @staticmethod
+    def obtener_rol_por_id_empleado(id_empleado: int) -> Optional[str]:
+        """
+        Obtiene el rol de un empleado por su ID.
+
+        Args:
+            id_empleado: ID del empleado a buscar
+
+        Returns:
+            Nombre del rol o None si no se encuentra.
+        """
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            query = """
+                    SELECT p.nombre
+                    FROM informacion_laboral il
+                    JOIN rol p ON il.id_rol = p.id_rol
+                    WHERE il.id_empleado = %s
+                    ORDER BY il.fecha_ingreso DESC
+                    LIMIT 1
+                """
+            cur.execute(query, (id_empleado,))
+            result = cur.fetchone()
+            return result[0] if result else None
+
+        except Exception as e:
+            print(f"Error al buscar rol del empleado: {str(e)}")
+            raise ValueError(f"No se pudo obtener el rol: {str(e)}")
+        finally:
+            if conn:
+                db.return_connection(conn)
+
 
     @staticmethod
     def actualizar_datos_personales2(id_empleado: int, telefono: str = None,

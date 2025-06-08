@@ -17,6 +17,7 @@ from crud.crudAdmintrador import AdminCRUD
 from crud.crudEmpleado import RegistroHorario
 from crud.crudEmpleado import Empleado
 from crud.crudNomina import NominaCRUD
+from crud.crudUsuario import Usuario
 from pydantic import BaseModel, Field
 from typing import List
 from typing import Tuple, List
@@ -24,7 +25,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta,
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
-                      LoginRequest, RegistroUpdate)
+                      LoginRequest, RegistroUpdate, CrearUsuarioRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -588,19 +589,51 @@ def obtener_departamento_empleado(empleado_id: int):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-#Login--------------------------------------------------------------
+#user
+# --------------------------------------------------------------
 
-#@app.post("/login", response_model=LoginResponse)
-#def login(request: LoginRequest):
-#    usuario = AdminCRUD.obtener_usuario_por_username(request.username)
-#    if not usuario or not verificar_password(request.password, usuario.password_hash):
-#        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+@app.post("/login", response_model=LoginResponse)
+def login(request: LoginRequest):
+    usuario = AdminCRUD.obtener_usuario_por_username(request.username)
 
-#    token = crear_token({
- #       "sub": usuario.username,
-  #      "id_empleado": usuario.id_empleado,
-   #     "rol": usuario.rol
-#    })
+    if not usuario or not verificar_password(request.password, usuario.password_hash):
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
-#    return {"access_token": token, "rol": usuario.rol}
+    # Obtener el id_rol desde empleado
+
+    id_rol = AdminCRUD.obtener_rol_por_id_empleado(usuario.id_empleado)
+
+    # Obtener permisos desde tabla rol
+    permisos = AdminCRUD.obtener_permisos_por_id_rol(id_rol)
+
+    token_data = {
+        "sub": usuario.username,
+        "id_empleado": usuario.id_empleado,
+        "id_rol": id_rol,
+        "permisos": permisos
+    }
+
+    token = crear_token(token_data)
+
+    return {
+        "access_token": token,
+        "permisos": permisos,
+        "rol": id_rol
+    }
+
+@app.post("/crear-usuario/")
+def crear_usuario(request: CrearUsuarioRequest):
+    try:
+        id_usuario = AdminCRUD.crear_usuario(
+            id_empleado=request.id_empleado,
+            id_rol=request.id_rol,
+            nombre_usuario=request.nombre_usuario,
+            contraseña=request.contraseña,
+            motivo=request.motivo
+        )
+        return {"mensaje": "Usuario creado correctamente", "id_usuario": id_usuario}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
