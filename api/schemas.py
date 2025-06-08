@@ -138,8 +138,8 @@ class UsuarioModel(BaseModel):
     nombre_usuario: str
     contrasena: str
     esta_activo: bool
-    fecha_activacion: str | None  # Usá datetime si ya lo estás manejando así
-    fecha_creacion: str | None
+    fecha_activacion: date | None
+    fecha_creacion: date | None
     motivo: str | None
 
 class Permisos(BaseModel):
