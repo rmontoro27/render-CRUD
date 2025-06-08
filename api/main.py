@@ -605,7 +605,7 @@ def login(request: LoginRequest):
         raise HTTPException(status_code=403, detail="Usuario inactivo")
 
     # Obtener el id_rol desde empleado
-    id_rol = AdminCRUD.obtener_rol_por_id_empleado(usuario.id_empleado)
+    id_rol = AdminCRUD.obtener_id_rol_por_id_empleado(usuario.id_empleado)
     if id_rol is None:
         raise HTTPException(status_code=404, detail="Rol no asignado al empleado")
 
