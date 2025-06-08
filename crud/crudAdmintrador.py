@@ -610,6 +610,14 @@ class AdminCRUD:
             if conn:
                 db.return_connection(conn)
 
+    @staticmethod
+    def obtener_id_rol_por_id_empleado(id_empleado: int):
+        conn = db.get_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT id_rol FROM empleado WHERE id_empleado = %s", (id_empleado,))
+        result = cur.fetchone()
+        return result[0] if result else None
+
 
     @staticmethod
     def actualizar_datos_personales2(id_empleado: int, telefono: str = None,
