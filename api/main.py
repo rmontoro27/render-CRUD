@@ -626,7 +626,7 @@ def login(request: LoginRequest):
     return {
         "access_token": token,
         "permisos": permisos,
-        "rol": id_rol
+        "rol": str(usuario.id_rol)
     }
 
 
