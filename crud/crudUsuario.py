@@ -45,7 +45,15 @@ class Usuario:
             conn.commit()
             return nuevo_id
 
+
+        except Exception as e:
+
+            print(f"Error al crear usuario: {e}")
+
+            raise HTTPException(status_code=500, detail=str(e))
+
         finally:
+
             if conn:
                 conn.close()
 
