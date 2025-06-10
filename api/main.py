@@ -589,6 +589,19 @@ def obtener_departamento_empleado(empleado_id: int):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+
+@app.get("/descargar-recibo/{id_nomina}")
+def descargar_recibo(id_nomina: int):
+    nomina = NominaCRUD.obtener_nomina(id_nomina)
+    if not nomina:
+        raise HTTPException(status_code=404, detail="Nómina no encontrada")
+
+    path_pdf = f"./pdfs/recibo_{id_nomina}.pdf"
+    if not os.path.exists(path_pdf):
+        path_pdf = NominaCRUD.generar_recibo_pdf(nomina.dict(), id_nomina)
+
+    return FileResponse(path_pdf, media_type='application/pdf', filename=f"recibo_{id_nomina}.pdf")
+
 #user
 # --------------------------------------------------------------
 

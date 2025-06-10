@@ -24,4 +24,5 @@ python-jose==3.3.0
 cloudinary==1.37.0
 python-multipart==0.0.20
 bcrypt==4.3.0
+reportlab==4.4.1
 
