@@ -202,12 +202,12 @@ class NominaCRUD:
                 if conn:
                     self.db.return_connection(conn)
 
-
-    def obtener_nomina(self, id_nomina: int) -> Optional[NominaResponse]:
+    @staticmethod
+    def obtener_nomina(id_nomina: int) -> Optional[NominaResponse]:
         """Devuelve una nómina como Pydantic model"""
         conn = None
         try:
-            conn = self.db.get_connection()
+            conn = db.get_connection()
             cur = conn.cursor()
 
             cur.execute("SELECT * FROM recibo_sueldo WHERE id_nomina=%s", (id_nomina,))
@@ -222,7 +222,7 @@ class NominaCRUD:
 
         finally:
             if conn:
-                self.db.return_connection(conn)
+                db.return_connection(conn)
 
     @staticmethod
     def obtener_nominas_empleado(id_empleado: int) -> List[NominaResponse]:
