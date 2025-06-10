@@ -33,6 +33,7 @@ from fastapi import HTTPException, status
 import cloudinary
 import cloudinary.uploader
 from fastapi import UploadFile, File, Form
+from fastapi.responses import FileResponse
 
 
 
@@ -598,9 +599,25 @@ def descargar_recibo(id_nomina: int):
 
     path_pdf = f"./pdfs/recibo_{id_nomina}.pdf"
     if not os.path.exists(path_pdf):
-        path_pdf = NominaCRUD.generar_recibo_pdf(nomina.dict(), id_nomina)
+        # Llamada explícita sin usar dict()
+        path_pdf = NominaCRUD.generar_recibo_pdf(
+            id_nomina=id_nomina,
+            nombre_empleado=nomina.nombre_empleado,
+            periodo=nomina.periodo,
+            fecha_de_pago=str(nomina.fecha_de_pago),
+            salario_base=nomina.salario_base,
+            bono_presentismo=nomina.bono_presentismo,
+            horas_extra=nomina.horas_extra,
+            descuento_jubilacion=nomina.descuento_jubilacion,
+            descuento_obra_social=nomina.descuento_obra_social,
+            sueldo_neto=nomina.sueldo_neto
+        )
 
-    return FileResponse(path_pdf, media_type='application/pdf', filename=f"recibo_{id_nomina}.pdf")
+    return FileResponse(
+        path_pdf,
+        media_type='application/pdf',
+        filename=f"recibo_{id_nomina}.pdf"
+    )
 
 #user
 # --------------------------------------------------------------
