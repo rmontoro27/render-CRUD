@@ -756,3 +756,14 @@ class AdminCRUD:
             if conn:
                 conn.close()
 
+    @staticmethod
+    def obtener_numero_identificacion(id_empleado: int):
+        conn = db.get_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT numero_identificacion FROM empleado WHERE id_empleado = %s", (id_empleado,))
+                result = cur.fetchone()
+                return result[0] if result else None
+        finally:
+            conn.close()
+
