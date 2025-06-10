@@ -110,10 +110,40 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
+class Permisos(BaseModel):
+    online_login: bool
+    offline_login: bool
+    ver_datos_personales: bool
+    editar_datos_personales: bool
+    ver_datos_laborales: bool
+    agregar_datos_laborales: bool
+    editar_datos_laborales: bool
+    agregar_empleado: bool
+    ver_registro_asistencia: bool
+    ver_informacion_bancaria: bool
+    editar_informacion_bancaria: bool
+    ingresar_asistencia: bool
+    ingresar_inasistencia: bool
+    ver_historial_nominas: bool
+    calcular_nomina_manualmente: bool
+    calcular_nomina_automaticamente: bool
+    agregar_concepto: bool
+    agregar_departamento: bool
+    agregar_puesto: bool
+    agregar_categoria: bool
+    agregar_salario_con_vigencia: bool
+    ver_vista_previa_recibo_sueldo: bool
+    descargar_recibo_sueldo: bool
+    ver_reportes: bool
+    cerrar_sesion: bool
+
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    permisos: Permisos
     rol: str
+    id_empleado: int
+    numero_identificacion: str
 
 class RegistroUpdate(BaseModel):
     tipo: Optional[str] = None
