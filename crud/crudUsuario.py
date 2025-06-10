@@ -26,34 +26,33 @@ class Usuario:
             if cur.fetchone():
                 raise ValueError("El nombre de usuario ya está en uso.")
 
+            # Calcular manualmente el próximo id_usuario
+            cur.execute("SELECT MAX(id_usuario) FROM usuario")
+            max_id = cur.fetchone()[0]
+            nuevo_id = (max_id or 0) + 1
+
             # Hashear la contraseña
             contrasena_hash = bcrypt.hashpw(contrasena.encode('utf-8'), bcrypt.gensalt())
 
             # Insertar el nuevo usuario
             cur.execute("""
-                    INSERT INTO usuario (
-                        id_empleado, id_rol, nombre_usuario, contrasena,
-                        esta_activo, fecha_activacion, fecha_creacion, motivo
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                    RETURNING id_usuario
-                """, (
-                id_empleado, id_rol, nombre_usuario, contrasena_hash.decode('utf-8'),
+                INSERT INTO usuario (
+                    id_usuario, id_empleado, id_rol, nombre_usuario, contrasena,
+                    esta_activo, fecha_activacion, fecha_creacion, motivo
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                nuevo_id, id_empleado, id_rol, nombre_usuario, contrasena_hash.decode('utf-8'),
                 True, datetime.utcnow(), datetime.utcnow(), motivo
             ))
 
-            nuevo_id = cur.fetchone()[0]
             conn.commit()
             return nuevo_id
 
-
         except Exception as e:
-
             print(f"Error al crear usuario: {e}")
-
             raise HTTPException(status_code=500, detail=str(e))
 
         finally:
-
             if conn:
                 conn.close()
 
