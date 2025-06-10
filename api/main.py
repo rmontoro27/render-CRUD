@@ -611,6 +611,7 @@ def login(request: LoginRequest):
 
     #  Obtener permisos desde tabla rol
     permisos = Usuario.obtener_permisos_por_id_rol(id_rol)
+    numero_identificacion = AdminCRUD.obtener_numero_identificacion(usuario.id_empleado)
 
     # Crear token
     token_data = {
