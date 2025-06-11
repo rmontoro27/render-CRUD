@@ -73,11 +73,11 @@ class AdminCRUD:
             print(f"[ERROR] Error al crear empleado: {e}")
             raise
 
-
-
-        except Exception as e:
-            db.conn.rollback()
-            raise ValueError(f"Error al crear empleado: {str(e)}")
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
 
 
 
