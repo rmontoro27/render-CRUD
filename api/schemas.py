@@ -198,3 +198,15 @@ class Permisos(BaseModel):
     descargar_recibo_sueldo: bool = False
     ver_reportes: bool = False
     cerrar_sesion: bool = False
+
+class ReciboResponse(BaseModel):
+    id_nomina: int
+    nombre_empleado: str
+    periodo: str
+    fecha_de_pago: date
+    salario_base: float
+    bono_presentismo: float
+    horas_extra: float
+    descuento_jubilacion: float
+    descuento_obra_social: float
+    sueldo_neto: float

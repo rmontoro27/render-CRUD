@@ -1,7 +1,7 @@
 import psycopg2
 from datetime import datetime, timedelta, date
 from typing import Optional, List
-from api.schemas import NominaBase, NominaResponse
+from api.schemas import NominaBase, NominaResponse, ReciboResponse
 from .database import db
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -203,7 +203,7 @@ class NominaCRUD:
                     self.db.return_connection(conn)
 
     @staticmethod
-    def obtener_nomina(id_nomina: int) -> Optional[NominaResponse]:
+    def obtener_nomina(id_nomina: int) -> Optional[ReciboResponse]:
         """Devuelve una nómina como Pydantic model"""
         conn = None
         try:
@@ -218,7 +218,7 @@ class NominaCRUD:
 
             columns = [desc[0] for desc in cur.description]
             nomina_dict = dict(zip(columns, result))
-            return NominaResponse(**nomina_dict)
+            return ReciboResponse(**nomina_dict)
 
         finally:
             if conn:
@@ -244,6 +244,8 @@ class NominaCRUD:
         finally:
             if conn:
                 db.return_connection(conn)
+
+
 
     def generar_recibo_pdf(
             id_nomina: int,
