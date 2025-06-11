@@ -173,7 +173,8 @@ class AdminCRUD:
                     "nombre": row[2],
                     "apellido": row[3],
                     "correo": row[4],
-                    "telefono": row[5]
+                    "telefono": row[5],
+                    "imagen_perfil_url": row[6]
                 }
                 for row in cur.fetchall()
             ]
