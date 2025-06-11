@@ -154,25 +154,31 @@ def crear_empleado(empleado: EmpleadoBase):
 async def crear_empleado(empleado: EmpleadoBase):
     try:
         print(f"[API] Inicio creación empleado - Datos recibidos:")
-        print(empleado.dict())
+        print(f"Nombre: {empleado.nombre}")
+        print(f"Apellido: {empleado.apellido}")
+        # Podés agregar más logs si querés
 
+        # Llama al método del CRUD
         empleado_creado = AdminCRUD.crear_empleado(empleado)
 
-        # Suponemos que AdminCRUD.crear_empleado ya te devuelve id_empleado en el dict
-        print("[API] Empleado creado exitosamente")
-        return empleado_creado
+        # Retorná como modelo directamente
+        return EmpleadoBase(**empleado_creado)
 
     except ValueError as e:
         print(f"[API] Error de valor: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
+
     except Exception as e:
-        import traceback
-        tb = traceback.format_exc()
-        print(f"[API] Error inesperado:\n{tb}")
+
+        print(f"[API] Error inesperado: {str(e)}")
+
         raise HTTPException(
+
             status_code=500,
+
             detail="Error interno del servidor"
+
         )
 
 @app.get("/empleados/{numero_identificacion}")
