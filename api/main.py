@@ -602,7 +602,7 @@ def descargar_recibo(id_nomina: int):
         # Llamada explícita sin usar dict()
         path_pdf = NominaCRUD.generar_recibo_pdf(
             id_nomina=id_nomina,
-            nombre_empleado=nomina.nombre_empleado,
+            nombre_empleado=nomina.nombre,
             periodo=nomina.periodo,
             fecha_de_pago=str(nomina.fecha_de_pago),
             salario_base=nomina.salario_base,

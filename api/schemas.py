@@ -201,7 +201,7 @@ class Permisos(BaseModel):
 
 class ReciboResponse(BaseModel):
     id_nomina: int
-    nombre_empleado: str
+    nombre: str
     periodo: str
     fecha_de_pago: date
     salario_base: float
