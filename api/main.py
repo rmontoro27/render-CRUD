@@ -158,7 +158,7 @@ async def crear_empleado(empleado: EmpleadoBase):
         print(f"Apellido: {empleado.apellido}")
         # Podés agregar más logs si querés
 
-        # Llama al método del CRUD
+        # Llama al mét del CRUD
         empleado_creado = AdminCRUD.crear_empleado(empleado)
 
         # Retorná como modelo directamente
