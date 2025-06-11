@@ -23,10 +23,15 @@ class AdminCRUD:
 
             numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado, 'numero_calle') else None
 
+            # Calcular manualmente el próximo id_empleado
+            cur.execute("SELECT MAX(id_empleado) FROM usuario")
+            max_id = cur.fetchone()[0]
+            nuevo_id = (max_id or 0) + 1
+
             cur.execute(
                 """
                 INSERT INTO empleado (
-                    nombre, apellido, tipo_identificacion, numero_identificacion,
+                    id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion,
                     fecha_nacimiento, correo_electronico, telefono, calle,
                     numero_calle, localidad, partido, provincia, genero, 
                     pais_nacimiento, estado_civil
@@ -36,7 +41,7 @@ class AdminCRUD:
                           numero_calle, telefono, correo_electronico
                 """,
                 (
-                    nuevo_empleado.nombre, nuevo_empleado.apellido, nuevo_empleado.tipo_identificacion,
+                    nuevo_empleado.nuevo_id, nuevo_empleado.nombre, nuevo_empleado.apellido, nuevo_empleado.tipo_identificacion,
                     nuevo_empleado.numero_identificacion, nuevo_empleado.fecha_nacimiento,
                     nuevo_empleado.correo_electronico, nuevo_empleado.telefono, nuevo_empleado.calle,
                     numero_calle, nuevo_empleado.localidad, nuevo_empleado.partido,
@@ -100,6 +105,10 @@ class AdminCRUD:
             # Conversión de campos
             numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado,
                                                                        'numero_calle') and nuevo_empleado.numero_calle is not None else None
+            # Calcular manualmente el próximo id_usuario
+            cur.execute("SELECT MAX(id_usuario) FROM usuario")
+            max_id = cur.fetchone()[0]
+            nuevo_id = (max_id or 0) + 1
 
             # Query SQL
             cur.execute(

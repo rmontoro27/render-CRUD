@@ -154,16 +154,18 @@ def crear_empleado(empleado: EmpleadoBase):
 async def crear_empleado(empleado: EmpleadoBase):
     try:
         print(f"[API] Inicio creación empleado - Datos recibidos:")
-        print(f"Nombre: {empleado.nombre}")
-        print(f"Apellido: {empleado.apellido}")
-        # Agrega logs para otros campos importantes
+        print(empleado.dict())
 
         empleado_creado = AdminCRUD.crear_empleado(empleado)
+
+        # Suponemos que AdminCRUD.crear_empleado ya te devuelve id_empleado en el dict
         print("[API] Empleado creado exitosamente")
         return empleado_creado
+
     except ValueError as e:
         print(f"[API] Error de valor: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
+
     except Exception as e:
         import traceback
         tb = traceback.format_exc()
