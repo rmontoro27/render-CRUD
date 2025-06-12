@@ -150,36 +150,23 @@ def crear_empleado(empleado: EmpleadoBase):
 """
 
 
-@app.post("/empleados/", response_model=EmpleadoBase)
-async def crear_empleado(empleado: EmpleadoBase):
+@app.post("/crear-empleado/")
+def crear_empleado(request: EmpleadoBase):
     try:
-        print(f"[API] Inicio creación empleado - Datos recibidos:")
-        print(f"Nombre: {empleado.nombre}")
-        print(f"Apellido: {empleado.apellido}")
-        # Podés agregar más logs si querés
+        id_empleado = AdminCRUD.crear_empleado(request)
 
-        # Llama al mét del CRUD
-        empleado_creado = AdminCRUD.crear_empleado(empleado)
-
-        # Retorná como modelo directamente
-        return EmpleadoBase(**empleado_creado)
+        return {
+            "mensaje": "Empleado creado correctamente",
+            "id_empleado": id_empleado
+        }
 
     except ValueError as e:
-        print(f"[API] Error de valor: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
 
-
     except Exception as e:
-
-        print(f"[API] Error inesperado: {str(e)}")
-
-        raise HTTPException(
-
-            status_code=500,
-
-            detail="Error interno del servidor"
-
-        )
+        import traceback
+        print("[ERROR] Error inesperado:\n", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @app.get("/empleados/{numero_identificacion}")
 def obtener_empleado(numero_identificacion: str):

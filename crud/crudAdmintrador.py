@@ -24,7 +24,7 @@ class AdminCRUD:
             numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado, 'numero_calle') else None
 
             # Calcular manualmente el próximo id_empleado
-            cur.execute("SELECT MAX(id_empleado) FROM usuario")
+            cur.execute("SELECT MAX(id_empleado) FROM empleado")
             max_id = cur.fetchone()[0]
             nuevo_id = (max_id or 0) + 1
 

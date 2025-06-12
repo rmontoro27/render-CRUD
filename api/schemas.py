@@ -22,7 +22,7 @@ class EmpleadoResponse(BaseModel):
     estado_civil: Optional[str] = None
 
 class EmpleadoBase(BaseModel):
-        id_empleado: int
+
         nombre: str
         apellido: str
         tipo_identificacion: str
