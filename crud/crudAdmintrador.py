@@ -10,7 +10,7 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.uploader import upload as cloudinary_upload
 import io
-
+from crud import validacion_entrada
 
 class AdminCRUD:
 
@@ -22,6 +22,8 @@ class AdminCRUD:
             cur = conn.cursor()
 
             numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado, 'numero_calle') else None
+
+            validacion_entrada.validar_datos_empleado(nuevo_empleado)
 
             # Calcular manualmente el próximo id_empleado
             cur.execute("SELECT MAX(id_empleado) FROM empleado")
