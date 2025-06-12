@@ -36,7 +36,7 @@ class AdminCRUD:
                     numero_calle, localidad, partido, provincia, genero, 
                     pais_nacimiento, estado_civil
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id_empleado, nombre, apellido, numero_identificacion, 
                           numero_calle, telefono, correo_electronico
                 """,
