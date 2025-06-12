@@ -41,7 +41,7 @@ class AdminCRUD:
                           numero_calle, telefono, correo_electronico
                 """,
                 (
-                    nuevo_empleado.nuevo_id, nuevo_empleado.nombre, nuevo_empleado.apellido, nuevo_empleado.tipo_identificacion,
+                    nuevo_id, nuevo_empleado.nombre, nuevo_empleado.apellido, nuevo_empleado.tipo_identificacion,
                     nuevo_empleado.numero_identificacion, nuevo_empleado.fecha_nacimiento,
                     nuevo_empleado.correo_electronico, nuevo_empleado.telefono, nuevo_empleado.calle,
                     numero_calle, nuevo_empleado.localidad, nuevo_empleado.partido,
