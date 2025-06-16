@@ -203,7 +203,7 @@ class AdminCRUD:
                 """
                 SELECT id_empleado, nombre, apellido, tipo_identificacion, numero_identificacion,
                        fecha_nacimiento, correo_electronico, telefono, calle,
-                       numero_calle, localidad, partido, provincia, genero, pais_nacimiento, estado_civil
+                       numero_calle, localidad, partido, provincia, genero, pais_nacimiento, estado_civil, imagen_perfil_url
                 FROM empleado
                 WHERE numero_identificacion = %s
                 """,
@@ -228,6 +228,7 @@ class AdminCRUD:
                     "genero": result[13],
                     "pais_nacimiento": result[14],
                     "estado_civil": result[15],
+                    "imagen_perfil_url": result[16]
                 }
             return None
         finally:
