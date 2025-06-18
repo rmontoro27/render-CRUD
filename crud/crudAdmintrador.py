@@ -770,6 +770,18 @@ class AdminCRUD:
                 conn.close()
 
     @staticmethod
+    def eliminar_imagen_perfil(id_empleado: int):
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                   UPDATE empleado
+                   SET imagen_perfil_url = NULL
+                   WHERE id_empleado = %s
+               """, (id_empleado,))
+            conn.commit()
+            return cur.rowcount
+
+    @staticmethod
     def obtener_numero_identificacion(id_empleado: int):
         conn = db.get_connection()
         try:
@@ -780,3 +792,49 @@ class AdminCRUD:
         finally:
             conn.close()
 
+#CUENTA BANCARIA-----------------------------------------------------------------------------------------------------
+    @staticmethod
+    def obtener_cuenta_bancaria(id_usuario: int):
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                 SELECT cb.numero_cuenta, cb.tipo_cuenta, b.nombre_banco
+                 FROM cuenta_bancaria cb
+                 JOIN banco b ON cb.codigo_banco = b.codigo_banco
+                 WHERE cb.id_usuario = %s
+             """, (id_usuario,))
+            result = cur.fetchone()
+            if not result:
+                return None
+            return {
+                'numero_cuenta': result[0],
+                'tipo_cuenta': result[1],
+                'nombre_banco': result[2]
+            }
+
+    @staticmethod
+    def crear_cuenta_bancaria(id_empleado: int, codigo_banco: str, numero_cuenta: str, tipo_cuenta: str):
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                 INSERT INTO cuenta_bancaria (id_empleado, codigo_banco, numero_cuenta, tipo_cuenta)
+                 VALUES (%s, %s, %s, %s)
+                 RETURNING id_cuenta
+             """, (id_empleado, codigo_banco, numero_cuenta, tipo_cuenta))
+            id_cuenta = cur.fetchone()[0]
+            conn.commit()
+            return id_cuenta
+
+    @staticmethod
+    def actualizar_cuenta_bancaria(id_empleado: int, codigo_banco: str, numero_cuenta: str, tipo_cuenta: str):
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                 UPDATE cuenta_bancaria
+                 SET codigo_banco = %s,
+                     numero_cuenta = %s,
+                     tipo_cuenta = %s
+                 WHERE id_empleado = %s
+             """, (codigo_banco, numero_cuenta, tipo_cuenta, id_empleado))
+            conn.commit()
+            return cur.rowcount  # Devuelve cuántas filas se actualizaron
