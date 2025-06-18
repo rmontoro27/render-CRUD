@@ -816,14 +816,20 @@ class AdminCRUD:
     def crear_cuenta_bancaria(id_empleado: int, codigo_banco: str, numero_cuenta: str, tipo_cuenta: str):
         with db.get_connection() as conn:
             cur = conn.cursor()
+
+            # Buscar el mayor ID actual
+            cur.execute("SELECT MAX(id_cuenta) FROM cuenta_bancaria")
+            max_id = cur.fetchone()[0]
+            nuevo_id = (max_id or 0) + 1
+
+            # Insertar con el nuevo ID
             cur.execute("""
-                 INSERT INTO cuenta_bancaria (id_empleado, codigo_banco, numero_cuenta, tipo_cuenta)
-                 VALUES (%s, %s, %s, %s)
-                 RETURNING id_cuenta
-             """, (id_empleado, codigo_banco, numero_cuenta, tipo_cuenta))
-            id_cuenta = cur.fetchone()[0]
+                INSERT INTO cuenta_bancaria (id_cuenta, id_empleado, codigo_banco, numero_cuenta, tipo_cuenta)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (nuevo_id, id_empleado, codigo_banco, numero_cuenta, tipo_cuenta))
+
             conn.commit()
-            return id_cuenta
+            return nuevo_id
 
     @staticmethod
     def actualizar_cuenta_bancaria(id_empleado: int, codigo_banco: str, numero_cuenta: str, tipo_cuenta: str):
