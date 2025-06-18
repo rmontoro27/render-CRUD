@@ -794,22 +794,22 @@ class AdminCRUD:
 
 #CUENTA BANCARIA-----------------------------------------------------------------------------------------------------
     @staticmethod
-    def obtener_cuenta_bancaria(id_usuario: int):
+    def obtener_cuenta_bancaria(id_empleado: int):
         with db.get_connection() as conn:
             cur = conn.cursor()
             cur.execute("""
-                 SELECT cb.numero_cuenta, cb.tipo_cuenta, b.nombre_banco
+                 SELECT cb.numero_cuenta, cb.tipo_cuenta, b.nombre
                  FROM cuenta_bancaria cb
                  JOIN banco b ON cb.codigo_banco = b.codigo_banco
-                 WHERE cb.id_usuario = %s
-             """, (id_usuario,))
+                 WHERE cb.id_empleado = %s
+             """, (id_empleado,))
             result = cur.fetchone()
             if not result:
                 return None
             return {
                 'numero_cuenta': result[0],
                 'tipo_cuenta': result[1],
-                'nombre_banco': result[2]
+                'nombre': result[2]
             }
 
     @staticmethod
