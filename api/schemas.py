@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional, List
 from datetime import date, time
+from pydantic import BaseModel, Field
 
 class EmpleadoResponse(BaseModel):
     """Modelo SOLO para respuestas (GET)"""
@@ -218,6 +219,6 @@ class CuentaBancariaInput(BaseModel):
     tipo_cuenta: str
 
 class CuentaBancariaModificar(BaseModel):
-    nombre: str
+    nombre: str = Field(alias="codigo_banco")
     numero_cuenta: str
     tipo_cuenta: str
