@@ -216,3 +216,8 @@ class CuentaBancariaInput(BaseModel):
     codigo_banco: str
     numero_cuenta: str
     tipo_cuenta: str
+
+class CuentaBancariaModificar(BaseModel):
+    nombre_banco: str
+    numero_cuenta: str
+    tipo_cuenta: str
