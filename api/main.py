@@ -702,7 +702,7 @@ def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
     try:
         filas_afectadas = AdminCRUD.actualizar_cuenta_bancaria(
             id_empleado=id_empleado,
-            nombre_banco=datos.nombre_banco,
+            nombre=datos.nombre,
             numero_cuenta=datos.numero_cuenta,
             tipo_cuenta=datos.tipo_cuenta
         )

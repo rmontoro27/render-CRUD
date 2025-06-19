@@ -218,6 +218,6 @@ class CuentaBancariaInput(BaseModel):
     tipo_cuenta: str
 
 class CuentaBancariaModificar(BaseModel):
-    nombre_banco: str
+    nombre: str
     numero_cuenta: str
     tipo_cuenta: str
