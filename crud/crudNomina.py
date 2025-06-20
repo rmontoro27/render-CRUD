@@ -12,155 +12,129 @@ class NominaCRUD:
 
         self.db = db
 
-
-    def calcular_nomina(self, id_empleado: int, periodo_texto: str, fecha_calculo: date):
-        """
-        Calcula la nómina completa para un empleado en un período específico
-        """
-        with self.db.get_connection() as conn:
-
+    @staticmethod
+    def calcular_nomina(id_empleado: int, periodo_texto: str, fecha_calculo: str, tipo: str):
+        with db.get_connection() as conn:
             try:
-                conn = self.db.get_connection()
+                conn = db.get_connection()
                 cur = conn.cursor()
 
-                # Establecer periodo y fecha de pago
                 fecha_calculo_dt = datetime.strptime(fecha_calculo, '%Y-%m-%d').date()
                 fecha_de_pago = fecha_calculo_dt + timedelta(days=7)
 
-                # Obtener id_periodo
+                # Obtener id_periodo y presentismo
                 cur.execute("""
                     SELECT id_periodo, presentismo 
                     FROM periodo_empleado 
                     WHERE id_empleado = %s AND periodo_texto = %s
                 """, (id_empleado, periodo_texto))
-                periodo_result = cur.fetchone()
+                row = cur.fetchone()
+                if not row:
+                    raise ValueError("Período no encontrado")
+                id_periodo, tiene_presentismo = row
 
-                if not periodo_result:
-                    raise ValueError("Período no encontrado para el empleado")
-
-                id_periodo, tiene_presentismo = periodo_result
-
-                # ELIMINAMOS EL INSERT PREMATURO QUE ESTABA AQUÍ
+                # Validar que no exista una nómina para ese empleado, periodo y tipo
+                cur.execute("""
+                    SELECT COUNT(*) 
+                    FROM nomina 
+                    WHERE id_empleado = %s AND id_periodo = %s AND tipo = %s
+                """, (id_empleado, id_periodo, tipo))
+                if cur.fetchone()[0] > 0:
+                    raise ValueError("Ya existe una nómina para este empleado, periodo y tipo")
 
                 # Obtener salario base
                 cur.execute("""
-                                SELECT s.valor_por_defecto 
-                                FROM salario_base s 
-                                INNER JOIN informacion_laboral i ON 
-                                    i.id_puesto = s.id_puesto AND 
-                                    i.id_categoria = s.id_categoria AND 
-                                    i.id_departamento = s.id_departamento
-                                WHERE i.id_empleado=%s AND %s BETWEEN s.fecha_inicio AND COALESCE(s.fecha_fin, CURRENT_DATE)
-                                ORDER BY s.fecha_inicio DESC
-                                LIMIT 1
-                            """, (id_empleado, fecha_calculo_dt))
-                salario_base_result = cur.fetchone()
-                if not salario_base_result:
+                    SELECT s.valor_por_defecto
+                    FROM salario_base s
+                    INNER JOIN informacion_laboral i 
+                    ON i.id_puesto = s.id_puesto AND i.id_categoria = s.id_categoria AND i.id_departamento = s.id_departamento
+                    WHERE i.id_empleado = %s AND %s BETWEEN s.fecha_inicio AND COALESCE(s.fecha_fin, CURRENT_DATE)
+                    ORDER BY s.fecha_inicio DESC
+                    LIMIT 1
+                """, (id_empleado, fecha_calculo_dt))
+                salario_base_row = cur.fetchone()
+                if not salario_base_row:
                     raise ValueError("Salario base no encontrado")
-                salario_base = float(salario_base_result[0])
+                salario_base = float(salario_base_row[0])
 
-                # 1. Obtener total de horas normales trabajadas en el período
+                # Obtener horas normales trabajadas
                 cur.execute("""
-                    SELECT SUM(rj.horas_normales_trabajadas)
-                    FROM registro_jornada rj
-                    WHERE rj.id_periodo = %s
+                    SELECT SUM(horas_normales_trabajadas) 
+                    FROM registro_jornada 
+                    WHERE id_periodo = %s
                 """, (id_periodo,))
-                horas_normales_result = cur.fetchone()
-                horas_normales_trabajadas = horas_normales_result[0] or 0
+                horas_normales = cur.fetchone()[0] or 0
+                if horas_normales == 0:
+                    raise ValueError("No se registraron horas normales")
 
-                if horas_normales_trabajadas == 0:
-                    raise ValueError("No se registraron horas normales trabajadas en el período")
+                valor_hora = round(salario_base / horas_normales, 2)
 
-                #  Calcular valor hora (redondeado a 2 decimales)
-                valor_hora = round(salario_base / horas_normales_trabajadas, 2)
-
-                # Actualizar tabla periodo_empleado con el valor_hora
+                # Actualizar valor hora en periodo_empleado
                 cur.execute("""
-                    UPDATE periodo_empleado
-                    SET valor_hora = %s
+                    UPDATE periodo_empleado 
+                    SET valor_hora = %s 
                     WHERE id_periodo = %s
                 """, (valor_hora, id_periodo))
 
-                #  Calcular monto de horas extras
+                # Calcular horas extra
                 cur.execute("""
                     SELECT rhe.cantidad_horas, rhe.tipo_hora_extra
                     FROM registro_hora_extra rhe
                     JOIN registro_jornada rj ON rj.id_registro_jornada = rhe.id_registro_jornada
                     WHERE rj.id_periodo = %s
                 """, (id_periodo,))
+                horas_extra_total = 0
+                for cantidad, tipo_extra in cur.fetchall():
+                    if tipo_extra == "50%":
+                        horas_extra_total += cantidad * valor_hora * 1.5
+                    elif tipo_extra == "100%":
+                        horas_extra_total += cantidad * valor_hora * 2
+                horas_extra_total = round(horas_extra_total, 2)
 
-                horas_extra_rows = cur.fetchall()
-                monto_horas_extra = 0.0
+                # Obtener conceptos de deducción
+                cur.execute("""
+                    SELECT descripcion, valor_por_defecto 
+                    FROM concepto 
+                    WHERE tipo_concepto = 'Deducción'
+                """)
+                descuentos = {desc: float(valor) * salario_base for desc, valor in cur.fetchall()}
 
-                for cantidad_horas, tipo in horas_extra_rows:
-                    if tipo == "50%":
-                        monto_horas_extra += cantidad_horas * valor_hora * 1.5
-                    elif tipo == "100%":
-                        monto_horas_extra += cantidad_horas * valor_hora * 2
+                # Obtener bono presentismo si existe
+                cur.execute("""
+                    SELECT valor_por_defecto 
+                    FROM concepto 
+                    WHERE descripcion = 'Bono Presentismo'
+                """)
+                row = cur.fetchone()
+                bono_presentismo = float(row[0]) * salario_base if tiene_presentismo and row else 0.0
 
-                monto_horas_extra = round(monto_horas_extra, 2)  # Redondear a 2 decimales
-                bono_presentismo_val = None
-                bono_antiguedad_val = None
-                horas_extra_val = None
-
-                descuentos_def = {
-                    'Jubilación': 0.0,
-                    'Obra Social': 0.0,
-                    'ANSSAL': 0.0,
-                    'Ley 19032': 0.0,
-                    'Impuesto a las Ganancias': 0.0,
-                    'Aporte Sindical': 0.0
-                }
-
-                descuentos = {
-                    'Jubilación': 0.11 * salario_base,
-                    'Obra Social': 0.03 * salario_base,
-                    'ANSSAL': 0.01 * salario_base,
-                    'Ley 19032': 0.02 * salario_base,
-                    'Impuesto a las Ganancias': 0.5 * salario_base,
-                    'Aporte Sindical': 0.02 * salario_base
-                }
-
-                bono_presentismo = 0.833 * salario_base if tiene_presentismo else 0.0
-                bono_antiguedad = 0.0
-                horas_extra = 0.0
-
-                bono_presentismo_val = bono_presentismo
-                bono_antiguedad_val = bono_antiguedad
-                horas_extra_val = horas_extra
-
-                descuentos_final = {**descuentos_def, **descuentos}
-
-                sueldo_bruto = salario_base + bono_presentismo + bono_antiguedad + horas_extra
-                total_descuentos = sum(descuentos_final.values())
+                sueldo_bruto = salario_base + bono_presentismo + horas_extra_total
+                total_descuentos = sum(descuentos.values())
                 sueldo_neto = sueldo_bruto - total_descuentos
 
-                # Combinar con los descuentos calculados
-                descuentos_final = {**descuentos_def, **descuentos}
-
-                # Construcción del diccionario final
+                # Armar datos
                 nomina_data = {
                     'id_empleado': id_empleado,
                     'id_periodo': id_periodo,
                     'fecha_de_pago': fecha_de_pago,
                     'salario_base': salario_base,
-                    'bono_presentismo': bono_presentismo_val,
-                    'bono_antiguedad': bono_antiguedad_val,
-                    'horas_extra': monto_horas_extra,
-                    'descuento_jubilacion': descuentos_final['Jubilación'],
-                    'descuento_obra_social': descuentos_final['Obra Social'],
-                    'descuento_anssal': descuentos_final['ANSSAL'],
-                    'descuento_ley_19032': descuentos_final['Ley 19032'],
-                    'impuesto_ganancias': descuentos_final['Impuesto a las Ganancias'],
-                    'descuento_sindical': descuentos_final['Aporte Sindical'],
+                    'bono_presentismo': bono_presentismo,
+                    'bono_antiguedad': 0.0,
+                    'horas_extra': horas_extra_total,
+                    'descuento_jubilacion': descuentos.get("Jubilación", 0.0),
+                    'descuento_obra_social': descuentos.get("Obra Social", 0.0),
+                    'descuento_anssal': descuentos.get("ANSSAL", 0.0),
+                    'descuento_ley_19032': descuentos.get("Ley 19032", 0.0),
+                    'impuesto_ganancias': descuentos.get("Ganancias", 0.0),
+                    'descuento_sindical': descuentos.get("Aporte Sindical", 0.0),
                     'sueldo_bruto': sueldo_bruto,
                     'sueldo_neto': sueldo_neto,
-                    'estado': 'Pendiente'
+                    'estado': 'Pendiente',
+                    'tipo': tipo
                 }
 
                 columns = ', '.join(nomina_data.keys())
                 placeholders = ', '.join(['%s'] * len(nomina_data))
-
                 cur.execute(
                     f"INSERT INTO nomina ({columns}) VALUES ({placeholders}) RETURNING id_nomina",
                     list(nomina_data.values())
@@ -169,26 +143,11 @@ class NominaCRUD:
                 id_nomina = cur.fetchone()[0]
                 conn.commit()
 
-                # Obtener nómina directamente desde la tabla base
-                cur.execute("""SELECT * FROM nomina WHERE id_nomina=%s""", (id_nomina,))
+                # Devolver nomina completa
+                cur.execute("SELECT * FROM nomina WHERE id_nomina = %s", (id_nomina,))
                 row = cur.fetchone()
-
-                if not row:
-                    raise ValueError(f"No se encontró la nómina recién insertada con ID {id_nomina}")
-
                 columns = [desc[0] for desc in cur.description]
-                nomina_completa = dict(zip(columns, row))
-
-                cur.execute("""
-                    SELECT p.periodo_texto
-                    FROM periodo_empleado p
-                    WHERE p.id_periodo = %s
-                """, (id_periodo,))
-                periodo_row = cur.fetchone()
-                if periodo_row:
-                    nomina_completa['periodo'] = periodo_row[0]
-
-                return nomina_completa
+                return dict(zip(columns, row))
 
             except psycopg2.Error as e:
                 if conn:
@@ -197,7 +156,7 @@ class NominaCRUD:
             except Exception as e:
                 if conn:
                     conn.rollback()
-                raise ValueError(f"Error al calcular nómina: {str(e)}")
+                raise ValueError(f"Error general al calcular nómina: {str(e)}")
             finally:
                 if conn:
                     self.db.return_connection(conn)
