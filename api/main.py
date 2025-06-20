@@ -605,8 +605,7 @@ def descargar_recibo(id_nomina: int):
         filename=f"recibo_{id_nomina}.pdf"
     )
 
-#user
-# --------------------------------------------------------------
+#user--------------------------------------------------------------
 
 @app.post("/login", response_model=LoginResponse)
 def login(request: LoginRequest):
