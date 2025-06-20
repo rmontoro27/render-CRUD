@@ -159,7 +159,7 @@ class NominaCRUD:
                 raise ValueError(f"Error general al calcular nómina: {str(e)}")
             finally:
                 if conn:
-                    self.db.return_connection(conn)
+                    db.return_connection(conn)
 
     @staticmethod
     def obtener_nomina(id_nomina: int) -> Optional[ReciboResponse]:

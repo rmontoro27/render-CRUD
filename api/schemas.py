@@ -78,6 +78,7 @@ class CalculoNominaRequest(BaseModel):
     id_empleado: int
     periodo: str
     fecha_calculo: date
+    tipo: str
 
 class EmpleadoNominaRequest(BaseModel):
     id_empleado: int
