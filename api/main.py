@@ -543,6 +543,18 @@ async def calcular_nomina_endpoint(request: CalculoNominaRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@app.post("/calcular_nomina", response_model=NominaResponse)
+async def calcular_nomina_endpoint(request: CalculoNominaRequest):
+    try:
+        return NominaCRUD.calcular_nomina(
+            id_empleado=request.id_empleado,
+            periodo_texto=request.periodo,
+            fecha_calculo=request.fecha_calculo,
+            tipo=request.tipo
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 @app.get("/{empleado_id}/puesto")
 def obtener_puesto_empleado(empleado_id: int):
     try:
@@ -704,7 +716,25 @@ def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
     except Exception as e:
         print("[ERROR INTERNO]", traceback.format_exc())  # Log completo
         raise HTTPException(status_code=500, detail="Error interno del servidor")
-    
+
+#Actualiza cuenta
+@app.put("/empleado/{id_empleado}/cuenta-bancaria")
+def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
+    try:
+        filas_afectadas = AdminCRUD.actualizar_cuenta_bancaria(
+            id_empleado=id_empleado,
+            nombre_banco=datos.nombre_banco,
+            numero_cuenta=datos.numero_cuenta,
+            tipo_cuenta=datos.tipo_cuenta
+        )
+        if filas_afectadas == 0:
+            raise HTTPException(status_code=404, detail="Cuenta bancaria no encontrada para actualizar")
+        return {"mensaje": "Cuenta bancaria actualizada"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        print("[ERROR INTERNO]", traceback.format_exc())  # Log completo
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 #SALARIO
 @app.get("/api/salarios/historial")
 def historial_salarios(puesto_id: int, departamento_id: int, categoria_id: int):
