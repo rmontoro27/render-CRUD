@@ -713,7 +713,7 @@ def historial_salarios(puesto_id: int, departamento_id: int, categoria_id: int):
         raise HTTPException(status_code=404, detail="No se encontró historial para esta combinación")
     return historial
 
-@app.post("/api/salarios/actualizarSalario")
+@app.put("/api/salarios/actualizarSalario")
 def actualizar_salario(datos: SalarioInput):
     try:
         AdminCRUD.actualizar_salario(
