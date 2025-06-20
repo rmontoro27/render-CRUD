@@ -219,6 +219,6 @@ class CuentaBancariaInput(BaseModel):
     tipo_cuenta: str
 
 class CuentaBancariaModificar(BaseModel):
-    nombre: str = Field(alias="codigo_banco")
+    nombre_banco: str = Field(alias="codigo_banco")
     numero_cuenta: str
     tipo_cuenta: str
