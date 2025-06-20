@@ -34,6 +34,7 @@ import cloudinary
 import cloudinary.uploader
 from fastapi import UploadFile, File, Form
 from fastapi.responses import FileResponse
+import traceback
 
 
 
@@ -702,7 +703,7 @@ def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
     try:
         filas_afectadas = AdminCRUD.actualizar_cuenta_bancaria(
             id_empleado=id_empleado,
-            nombre_banco=datos.nombre,
+            nombre_banco=datos.nombre_banco,
             numero_cuenta=datos.numero_cuenta,
             tipo_cuenta=datos.tipo_cuenta
         )
@@ -711,5 +712,6 @@ def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
         return {"mensaje": "Cuenta bancaria actualizada"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
+    except Exception as e:
+        print("[ERROR INTERNO]", traceback.format_exc())  # Log completo
         raise HTTPException(status_code=500, detail="Error interno del servidor")

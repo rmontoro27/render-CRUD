@@ -836,10 +836,7 @@ class AdminCRUD:
         with db.get_connection() as conn:
             cur = conn.cursor()
 
-            # Buscar el código del banco por el nombre
-            cur.execute("""
-                SELECT codigo_banco FROM banco WHERE nombre = %s
-            """, (nombre_banco,))
+            cur.execute("SELECT codigo_banco FROM banco WHERE nombre = %s", (nombre_banco,))
             result = cur.fetchone()
 
             if not result:
@@ -847,7 +844,6 @@ class AdminCRUD:
 
             codigo_banco = result[0]
 
-            # Actualizar los datos de la cuenta bancaria
             cur.execute("""
                 UPDATE cuenta_bancaria
                 SET codigo_banco = %s,
@@ -857,4 +853,4 @@ class AdminCRUD:
             """, (codigo_banco, numero_cuenta, tipo_cuenta, id_empleado))
 
             conn.commit()
-            return cur.rowcount  # Devuelve cuántas filas fueron actualizadas
+            return cur.rowcount
