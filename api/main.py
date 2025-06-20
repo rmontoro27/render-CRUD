@@ -519,7 +519,7 @@ async def buscar_nominas_empleado(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-# Opción 4: Obtener nómina específica por ID (GET)
+# Obtener nómina específica por ID (GET)
 @app.get("/nominas/{id_nomina}", response_model=NominaResponse)
 async def obtener_nomina(id_nomina: int):
     try:
@@ -530,19 +530,7 @@ async def obtener_nomina(id_nomina: int):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-@app.post("/calcular", response_model=NominaResponse)
-async def calcular_nomina_endpoint(request: CalculoNominaRequest):
-    try:
-        return NominaCRUD.calcular_nomina(
-            id_empleado=request.id_empleado,
-            periodo_texto=request.periodo,
-            fecha_calculo=request.fecha_calculo,
-            tipo=request.tipo
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
+# Calcular Nomina
 @app.post("/calcular_nomina", response_model=NominaResponse)
 async def calcular_nomina_endpoint(request: CalculoNominaRequest):
     try:
@@ -717,24 +705,7 @@ def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
         print("[ERROR INTERNO]", traceback.format_exc())  # Log completo
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
-#Actualiza cuenta
-@app.put("/empleado/{id_empleado}/cuenta-bancaria")
-def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
-    try:
-        filas_afectadas = AdminCRUD.actualizar_cuenta_bancaria(
-            id_empleado=id_empleado,
-            nombre_banco=datos.nombre_banco,
-            numero_cuenta=datos.numero_cuenta,
-            tipo_cuenta=datos.tipo_cuenta
-        )
-        if filas_afectadas == 0:
-            raise HTTPException(status_code=404, detail="Cuenta bancaria no encontrada para actualizar")
-        return {"mensaje": "Cuenta bancaria actualizada"}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        print("[ERROR INTERNO]", traceback.format_exc())  # Log completo
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+
 #SALARIO
 @app.get("/api/salarios/historial")
 def historial_salarios(puesto_id: int, departamento_id: int, categoria_id: int):
