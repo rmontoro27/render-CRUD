@@ -854,3 +854,24 @@ class AdminCRUD:
 
             conn.commit()
             return cur.rowcount
+
+##SALARIO
+    @staticmethod
+    def obtener_historial_salarios(puesto_id: int, departamento_id: int, categoria_id: int):
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("""
+                SELECT valor_por_defecto, fecha_inicio, fecha_fin
+                FROM salario_base
+                WHERE id_puesto = %s AND id_departamento = %s AND id_categoria = %s
+                ORDER BY fecha_inicio DESC
+            """, (puesto_id, departamento_id, categoria_id))
+            resultados = cur.fetchall()
+            return [
+                {
+                    "valor": float(row[0]),
+                    "fecha_inicio": row[1].isoformat(),
+                    "fecha_fin": row[2].isoformat() if row[2] else None,
+                }
+                for row in resultados
+            ]

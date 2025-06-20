@@ -704,3 +704,11 @@ def put_cuenta_bancaria(id_empleado: int, datos: CuentaBancariaModificar):
     except Exception as e:
         print("[ERROR INTERNO]", traceback.format_exc())  # Log completo
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+    
+#SALARIO
+@app.get("/api/salarios/historial")
+def historial_salarios(puesto_id: int, departamento_id: int, categoria_id: int):
+    historial = AdminCRUD.obtener_historial_salarios(puesto_id, departamento_id, categoria_id)
+    if not historial:
+        raise HTTPException(status_code=404, detail="No se encontró historial para esta combinación")
+    return historial
