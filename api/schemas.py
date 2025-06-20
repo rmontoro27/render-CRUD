@@ -224,3 +224,10 @@ class CuentaBancariaModificar(BaseModel):
     nombre_banco: str = Field(alias="codigo_banco")
     numero_cuenta: str
     tipo_cuenta: str
+    
+class SalarioInput(BaseModel):
+    puesto_id: int
+    departamento_id: int
+    categoria_id: int
+    valor_por_defecto: float
+    fecha_inicio: str    

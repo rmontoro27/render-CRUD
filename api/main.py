@@ -25,7 +25,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta,
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
-                      LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar)
+                      LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar, SalarioInput)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -712,3 +712,23 @@ def historial_salarios(puesto_id: int, departamento_id: int, categoria_id: int):
     if not historial:
         raise HTTPException(status_code=404, detail="No se encontró historial para esta combinación")
     return historial
+
+@app.post("/api/salarios/actualizarSalario")
+def actualizar_salario(datos: SalarioInput):
+    try:
+        AdminCRUD.actualizar_salario(
+            datos.puesto_id,
+            datos.departamento_id,
+            datos.categoria_id,
+            datos.valor_por_defecto,
+            datos.fecha_inicio
+        )
+        return {"mensaje": "Salario actualizado correctamente"}
+
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
+     
+

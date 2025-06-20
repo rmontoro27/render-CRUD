@@ -875,3 +875,28 @@ class AdminCRUD:
                 }
                 for row in resultados
             ]
+    @staticmethod
+    def actualizar_salario(puesto_id: int, departamento_id: int, categoria_id: int, valor_por_defecto: float, fecha_inicio: str):
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+
+            # Validaciones (opcional si ya validaste en la API)
+            cur.execute("SELECT 1 FROM puesto WHERE id_puesto = %s", (puesto_id,))
+            if not cur.fetchone():
+                raise ValueError(f"No existe el puesto con ID {puesto_id}")
+
+            cur.execute("SELECT 1 FROM departamento WHERE id_departamento = %s", (departamento_id,))
+            if not cur.fetchone():
+                raise ValueError(f"No existe el departamento con ID {departamento_id}")
+
+            cur.execute("SELECT 1 FROM categoria WHERE id_categoria = %s", (categoria_id,))
+            if not cur.fetchone():
+                raise ValueError(f"No existe la categoría con ID {categoria_id}")
+
+            # Insertar nuevo salario
+            cur.execute("""
+                INSERT INTO salario_base (id_puesto, id_departamento, id_categoria, valor_por_defecto, fecha_inicio)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (puesto_id, departamento_id, categoria_id, valor_por_defecto, fecha_inicio))
+
+            conn.commit()
