@@ -1013,62 +1013,65 @@ class AdminCRUD:
             conn.commit()
 
     @staticmethod
-    def guardar_documento_cv(empleado_id: int, contenido: bytes, descripcion: str = None):
+    def guardar_documento_tipo(empleado_id: int, contenido: bytes, tipo: str, descripcion: str = None):
         tipos_validos = [
             'DNI', 'CUIL', 'Partida de nacimiento', 'CV', 'Título', 'Domicilio',
             'AFIP', 'Foto', 'CBU', 'Certificado médico', 'Licencia de conducir', 'Contrato', 'Otros'
         ]
 
+        if tipo not in tipos_validos:
+            raise ValueError(f"Tipo de documento inválido: {tipo}")
+
         conn = None
         try:
-            # Verificamos existencia del empleado
+            # Verificar existencia de empleado
             conn = db.get_connection()
             cur = conn.cursor()
             cur.execute("SELECT 1 FROM empleado WHERE id_empleado = %s", (empleado_id,))
             if not cur.fetchone():
                 raise ValueError(f"No existe el empleado con ID {empleado_id}")
 
-            # Subimos el archivo a Cloudinary
+            # Subir a Cloudinary
             result = cloudinary.uploader.upload(
                 io.BytesIO(contenido),
-                resource_type="raw",  # importante para PDF, DOCX, etc.
-                folder="documentos_cv",
-                public_id=f"{empleado_id}_cv_{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                resource_type="raw",
+                folder=f"documentos_{tipo.lower()}",
+                public_id=f"{empleado_id}_{tipo.lower()}_{datetime.now().strftime('%Y%m%d%H%M%S')}",
                 use_filename=True,
                 overwrite=False
             )
             url_archivo = result["secure_url"]
 
-            # Insertamos el documento en la tabla
+            # Insertar en tabla
             cur.execute("""
-                    INSERT INTO documento (id_empleado, tipo, archivo_asociado, descripcion)
-                    VALUES (%s, %s, %s, %s)
-                """, (empleado_id, 'CV', url_archivo, descripcion))
+                INSERT INTO documento (id_empleado, tipo, archivo_asociado, descripcion)
+                VALUES (%s, %s, %s, %s)
+            """, (empleado_id, tipo, url_archivo, descripcion))
             conn.commit()
 
             return url_archivo
 
         except Exception as e:
-            raise Exception(f"Error al guardar documento CV: {e}")
+            raise Exception(f"Error al guardar documento tipo {tipo}: {e}")
         finally:
             if conn:
                 conn.close()
 
     @staticmethod
-    def obtener_cv(empleado_id: int):
+    def obtener_documento_tipo(empleado_id: int, tipo: str):
         with db.get_connection() as conn:
             cur = conn.cursor()
             cur.execute("""
                 SELECT id_documento, tipo, archivo_asociado, descripcion, fecha_subida
                 FROM documento
-                WHERE id_empleado = %s AND tipo = 'CV'
+                WHERE id_empleado = %s AND tipo = %s
                 ORDER BY fecha_subida DESC
                 LIMIT 1
-            """, (empleado_id,))
+            """, (empleado_id, tipo))
             row = cur.fetchone()
 
             if not row:
-                raise ValueError(f"No se encontró CV para el empleado {empleado_id}")
+                raise ValueError(f"No se encontró documento tipo '{tipo}' para el empleado {empleado_id}")
 
             return {
                 "id_documento": row[0],

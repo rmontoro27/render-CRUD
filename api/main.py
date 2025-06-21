@@ -783,40 +783,39 @@ def modificar_concepto(codigo: str, datos: ConceptoUpdate):
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al modificar concepto")
 
-
-@app.post("/api/documentos/subir-cv")
-async def subir_cv(
+@app.post("/api/documentos/subir-titulo")
+async def subir_documento(
     archivo: UploadFile = File(...),
+    tipo: str = Form(...),
     empleado_id: int = Form(...),
     descripcion: str = Form(None)):
-
-    if not archivo.filename.lower().endswith(('.pdf')):
-        raise HTTPException(status_code=400, detail="Solo se permiten archivos PDF")
-
     try:
         contenido = await archivo.read()
 
         print(f"Archivo recibido: {archivo.filename}, tamaño: {len(contenido)} bytes")
 
-        url_cv = AdminCRUD.guardar_documento_cv(
+        url_titulo = AdminCRUD.guardar_documento_tipo(
             empleado_id,
             contenido,
+            tipo,
             descripcion
         )
-        return {"mensaje": "📄 CV subido correctamente", "url": url_cv}
+        return {"mensaje": f"{tipo} subido correctamente", "url": url_titulo}
 
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        print(f"❌ Error completo: {e}")  # <--- importante
-        raise HTTPException(status_code=500, detail="Error al subir el CV")
+        print(f"❌ Error al subir título: {e}")
+        raise HTTPException(status_code=500, detail="Error al subir el título")
 
 
 @app.get("/api/documentos/cv/{empleado_id}")
-def obtener_cv(empleado_id: int):
+def obtener_documento(empleado_id: int, tipo: str):
     try:
-        return AdminCRUD.obtener_cv(empleado_id)
+        return AdminCRUD.obtener_documento_tipo(empleado_id, tipo)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error al obtener el CV")
+        raise HTTPException(status_code=500, detail=f"Error al obtener el {tipo}")
+
+
