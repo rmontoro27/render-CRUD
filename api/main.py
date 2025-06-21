@@ -758,3 +758,15 @@ def listar_conceptos():
         return AdminCRUD.listar_conceptos()
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al listar conceptos")
+
+@app.delete("/api/conceptos/{codigo}")
+def eliminar_concepto(codigo: str):
+    try:
+        AdminCRUD.eliminar_concepto(codigo)
+        return {"mensaje": f"🗑 Concepto {codigo} eliminado correctamente"}
+
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al eliminar concepto")

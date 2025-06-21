@@ -951,3 +951,17 @@ class AdminCRUD:
             for c in conceptos
         ]
 
+    @staticmethod
+    def eliminar_concepto(codigo: str):
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+
+            # Verificar existencia
+            cur.execute("SELECT 1 FROM concepto WHERE codigo = %s", (codigo,))
+            if not cur.fetchone():
+                raise ValueError(f"No existe el concepto con código {codigo}")
+
+            # Eliminar
+            cur.execute("DELETE FROM concepto WHERE codigo = %s", (codigo,))
+            conn.commit()
+
