@@ -261,3 +261,10 @@ class JornadaRequest(BaseModel):
     horas_normales_trabajadas: float
     horas_extra: float
     motivo: str
+
+class JornadaParcialRequest(BaseModel):
+    id_empleado: int
+    fecha: date
+    hora_entrada: time | None = None
+    hora_salida: time | None = None
+    motivo: str

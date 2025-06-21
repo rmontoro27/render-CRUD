@@ -26,7 +26,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
-                      SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest)
+                      SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest, JornadaParcialRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -846,6 +846,22 @@ def registrar_jornada(request: JornadaRequest):
             motivo=request.motivo
         )
         return {"mensaje": "Jornada registrada correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+
+@app.post("/registrar-jornada-parcial")
+def registrar_jornada_parcial(request: JornadaParcialRequest):
+    try:
+        AdminCRUD.registrar_jornada_parcial(
+            id_empleado=request.id_empleado,
+            fecha=request.fecha,
+            hora_entrada=request.hora_entrada,
+            hora_salida=request.hora_salida,
+            motivo=request.motivo
+        )
+        return {"mensaje": "Registro parcial de jornada realizado correctamente"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 

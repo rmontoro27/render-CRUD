@@ -1199,3 +1199,67 @@ class AdminCRUD:
                 cur.close()
             if 'conn' in locals():
                 conn.close()
+
+    @staticmethod
+    def registrar_jornada_parcial(id_empleado: int, fecha: date, hora_entrada: time = None, hora_salida: time = None,
+                                  motivo: str = ""):
+        if not hora_entrada and not hora_salida:
+            raise ValueError("Debe especificar al menos hora_entrada o hora_salida")
+
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+
+            # Obtener o crear el período
+            cur.execute("SELECT obtener_o_crear_periodo_empleado(%s, %s);", (id_empleado, fecha))
+            id_periodo = cur.fetchone()[0]
+
+            # Verificar si ya existe un registro para esa fecha
+            cur.execute("""
+                SELECT id_registro_jornada, hora_entrada, hora_salida
+                FROM registro_jornada
+                WHERE id_empleado = %s AND fecha = %s
+            """, (id_empleado, fecha))
+
+            row = cur.fetchone()
+
+            if row:
+                id_registro, entrada_actual, salida_actual = row
+
+                nueva_entrada = hora_entrada or entrada_actual
+                nueva_salida = hora_salida or salida_actual
+
+                cur.execute("""
+                    UPDATE registro_jornada
+                    SET hora_entrada = %s,
+                        hora_salida = %s,
+                        observaciones = %s
+                    WHERE id_registro_jornada = %s
+                """, (nueva_entrada, nueva_salida, motivo, id_registro))
+            else:
+                dia = fecha.strftime('%A')  # obtener el nombre del día
+                cur.execute("""
+                    INSERT INTO registro_jornada (
+                        id_empleado,
+                        id_periodo,
+                        fecha,
+                        dia,
+                        hora_entrada,
+                        hora_salida,
+                        estado_jornada,
+                        horas_normales_trabajadas,
+                        observaciones
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    id_empleado,
+                    id_periodo,
+                    fecha,
+                    dia,
+                    hora_entrada,
+                    hora_salida,
+                    'Incompleta',
+                    0,
+                    motivo
+                ))
+
+            conn.commit()
