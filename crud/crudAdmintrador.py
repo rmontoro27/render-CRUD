@@ -1095,3 +1095,107 @@ class AdminCRUD:
             vectores = {row[0] for row in cur.fetchall()}
 
         return {'Neutro', 'Sonrisa', 'Giro'}.issubset(vectores)
+
+#Jornada---------------------------------------------------------------------------------------
+
+    @staticmethod
+    def registrar_jornada(
+            id_empleado: int,
+            fecha: date,
+            dia: str,
+            hora_entrada: time,
+            hora_salida: time,
+            estado_jornada: str,
+            horas_normales_trabajadas: float,
+            horas_extra: float,
+            motivo: str
+    ):
+        try:
+            # 1. Abrir conexión
+            with db.get_connection() as conn:
+
+                cur = conn.cursor()
+
+            # 2. Obtener o crear el periodo
+            cur.execute("SELECT obtener_o_crear_periodo_empleado(%s, %s);", (id_empleado, fecha))
+            id_periodo = cur.fetchone()[0]
+
+            # 3. Insertar en registro_jornada
+            cur.execute("""
+                INSERT INTO registro_jornada (
+                    id_empleado,
+                    id_periodo,
+                    fecha,
+                    dia,
+                    hora_entrada,
+                    hora_salida,
+                    estado_jornada,
+                    horas_normales_trabajadas,
+                    observaciones
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id_registro_jornada;
+            """, (
+                id_empleado,
+                id_periodo,
+                fecha,
+                dia,
+                hora_entrada,
+                hora_salida,
+                estado_jornada,
+                horas_normales_trabajadas,
+                motivo
+            ))
+
+            id_jornada_insertada = cur.fetchone()[0]
+
+            # 4. Verificar si es feriado
+            cur.execute("SELECT EXISTS (SELECT 1 FROM feriado WHERE fecha = %s);", (fecha,))
+            es_feriado = cur.fetchone()[0]
+
+            # 5. Si hay horas extra, insertar en registro_hora_extra
+            if horas_extra > 0:
+                tipo = None
+                observacion = None
+
+                if es_feriado or dia.lower() == 'domingo':
+                    tipo = '100%'
+                    observacion = 'Horas extra con recargo total (feriado o domingo)'
+                elif dia.lower() == 'sábado':
+                    if hora_salida > time(13, 0):
+                        tipo = '100%'
+                        observacion = 'Horas extra con recargo total (sábado después de las 13:00)'
+                    else:
+                        tipo = '50%'
+                        observacion = 'Horas extra con recargo del 50% (sábado antes de las 13:00)'
+                else:
+                    tipo = '50%'
+                    observacion = 'Horas extra con recargo del 50% (día de semana)'
+
+                cur.execute("""
+                    INSERT INTO registro_hora_extra (
+                        id_registro_jornada,
+                        cantidad_horas,
+                        tipo_hora_extra,
+                        observaciones
+                    ) VALUES (%s, %s, %s, %s);
+                """, (
+                    id_jornada_insertada,
+                    horas_extra,
+                    tipo,
+                    observacion
+                ))
+
+            # 6. Confirmar y cerrar
+            conn.commit()
+            print("✅ Jornada y horas extra registradas correctamente.")
+
+        except Exception as e:
+            if 'conn' in locals():
+                conn.rollback()
+            print("❌ Error al registrar jornada:", e)
+
+        finally:
+            if 'cur' in locals():
+                cur.close()
+            if 'conn' in locals():
+                conn.close()

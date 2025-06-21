@@ -26,7 +26,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
-                      SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate)
+                      SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -734,6 +734,7 @@ def actualizar_salario(datos: SalarioInput):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
      
 
+
 @app.post("/api/conceptos/agregar")
 def agregar_concepto(datos: ConceptoInput):
     try:
@@ -828,5 +829,23 @@ def verificar_vectores(empleado_id: int):
         raise HTTPException(status_code=500, detail="Error al verificar vectores biométricos")
 
 
+#Jornada------------------------------------------------------------------------------
 
+@app.post("/registrar-jornada")
+def registrar_jornada(request: JornadaRequest):
+    try:
+        AdminCRUD.registrar_jornada(
+            id_empleado=request.id_empleado,
+            fecha=request.fecha,
+            dia=request.dia,
+            hora_entrada=request.hora_entrada,
+            hora_salida=request.hora_salida,
+            estado_jornada=request.estado_jornada,
+            horas_normales_trabajadas=request.horas_normales_trabajadas,
+            horas_extra=request.horas_extra,
+            motivo=request.motivo
+        )
+        return {"mensaje": "Jornada registrada correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
