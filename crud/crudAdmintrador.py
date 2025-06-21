@@ -1011,3 +1011,81 @@ class AdminCRUD:
             query = f"UPDATE concepto SET {', '.join(campos)} WHERE codigo = %s"
             cur.execute(query, tuple(valores))
             conn.commit()
+
+    @staticmethod
+    def guardar_documento_cv(empleado_id: int, contenido: bytes, descripcion: str = None):
+        tipos_validos = [
+            'DNI', 'CUIL', 'Partida de nacimiento', 'CV', 'Título', 'Domicilio',
+            'AFIP', 'Foto', 'CBU', 'Certificado médico', 'Licencia de conducir', 'Contrato', 'Otros'
+        ]
+
+        conn = None
+        try:
+            # Verificamos existencia del empleado
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM empleado WHERE id_empleado = %s", (empleado_id,))
+            if not cur.fetchone():
+                raise ValueError(f"No existe el empleado con ID {empleado_id}")
+
+            # Subimos el archivo a Cloudinary
+            result = cloudinary.uploader.upload(
+                io.BytesIO(contenido),
+                resource_type="raw",  # importante para PDF, DOCX, etc.
+                folder="documentos_cv",
+                public_id=f"{empleado_id}_cv_{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                use_filename=True,
+                overwrite=False
+            )
+            url_archivo = result["secure_url"]
+
+            # Insertamos el documento en la tabla
+            cur.execute("""
+                    INSERT INTO documento (id_empleado, tipo, archivo_asociado, descripcion)
+                    VALUES (%s, %s, %s, %s)
+                """, (empleado_id, 'CV', url_archivo, descripcion))
+            conn.commit()
+
+            return url_archivo
+
+        except Exception as e:
+            raise Exception(f"Error al guardar documento CV: {e}")
+        finally:
+            if conn:
+                conn.close()
+
+
+    @staticmethod
+    def actualizar_imagen_perfil2(image_bytes: bytes, usuario_id: int):
+        """
+        Sube una imagen a Cloudinary y actualiza la URL en la base de datos para el usuario indicado.
+
+        Args:
+            image_bytes: El contenido de la imagen en bytes
+            usuario_id: ID del empleado a actualizar
+
+        Returns:
+            URL segura de la imagen subida
+        """
+        conn = None
+        try:
+            # Subir a Cloudinary
+            result = cloudinary.uploader.upload(io.BytesIO(image_bytes), folder="perfiles")
+            image_url = result["secure_url"]
+
+            # Guardar en base de datos
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE empleado SET imagen_perfil_url = %s WHERE id_empleado = %s",
+                (image_url, usuario_id)
+            )
+            conn.commit()
+            return image_url
+
+        except Exception as e:
+            raise Exception(f"Error al subir imagen: {e}")
+
+        finally:
+            if conn:
+                conn.close()

@@ -1,5 +1,7 @@
 import uuid
 from datetime import datetime, timedelta, date, time
+import io
+
 from .database import db, Database
 import cloudinary
 import cloudinary.uploader
@@ -292,6 +294,7 @@ class Empleado:
                 db.return_connection(conn)
             except:
                 pass
+
 
 
 
@@ -757,6 +760,7 @@ class RegistroHorario:
         except Exception as e:
             db.conn.rollback()
             raise ValueError(f"Error al actualizar registro: {str(e)}")
+
 
 
 

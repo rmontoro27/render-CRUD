@@ -782,3 +782,27 @@ def modificar_concepto(codigo: str, datos: ConceptoUpdate):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al modificar concepto")
+
+
+@app.post("/api/documentos/subir-cv")
+async def subir_cv(
+    archivo: UploadFile = File(...),
+    empleado_id: int = Form(...),
+    descripcion: str = Form(None)):
+    try:
+        contenido = await archivo.read()
+
+        print(f"Archivo recibido: {archivo.filename}, tamaño: {len(contenido)} bytes")
+
+        url_cv = AdminCRUD.guardar_documento_cv(
+            empleado_id,
+            contenido,
+            descripcion
+        )
+        return {"mensaje": "📄 CV subido correctamente", "url": url_cv}
+
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        print(f"❌ Error completo: {e}")  # <--- importante
+        raise HTTPException(status_code=500, detail="Error al subir el CV")
