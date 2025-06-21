@@ -26,7 +26,8 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
-                      SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest, JornadaParcialRequest)
+                      SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest,
+                      JornadaParcialRequest, IncidenciaAsistenciaRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -865,3 +866,20 @@ def registrar_jornada_parcial(request: JornadaParcialRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
+@app.post("/registrar-incidencia/")
+def registrar_incidencia_asistencia_endpoint(datos: IncidenciaAsistenciaRequest):
+    try:
+        AdminCRUD.registrar_incidencia_asistencia(
+            id_empleado=datos.id_empleado,
+            fecha=datos.fecha,
+            dia=datos.dia,
+            tipo=datos.tipo,
+            descripcion=datos.descripcion
+        )
+        return {"mensaje": "Incidencia registrada correctamente"}
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")

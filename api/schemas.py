@@ -268,3 +268,10 @@ class JornadaParcialRequest(BaseModel):
     hora_entrada: time | None = None
     hora_salida: time | None = None
     motivo: str
+
+class IncidenciaAsistenciaRequest(BaseModel):
+    id_empleado: int
+    fecha: date
+    dia: str
+    tipo: str
+    descripcion: str

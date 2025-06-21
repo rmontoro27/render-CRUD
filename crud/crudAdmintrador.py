@@ -1263,3 +1263,54 @@ class AdminCRUD:
                 ))
 
             conn.commit()
+
+    @staticmethod
+    def registrar_incidencia_asistencia(
+            id_empleado,
+            fecha,
+            dia,
+            tipo,
+            descripcion
+    ):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+
+            # 2. Obtener o crear el periodo
+            cur.execute("SELECT obtener_o_crear_periodo_empleado(%s, %s);", (id_empleado, fecha))
+            id_periodo = cur.fetchone()[0]
+
+            # 3. Insertar en incidencia_asistencia
+            cur.execute("""
+                INSERT INTO incidencia_asistencia (
+                    id_empleado,
+                    id_periodo,
+                    fecha,
+                    dia,
+                    tipo,
+                    descripcion
+                ) VALUES (%s, %s, %s, %s, %s, %s)
+            """, (
+                id_empleado,
+                id_periodo,
+                fecha,
+                dia,
+                tipo,
+                descripcion
+            ))
+
+            conn.commit()
+            print("✅ Incidencia en asistencia registrada correctamente")
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            print("❌ Error al registrar incidencia:", e)
+
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
