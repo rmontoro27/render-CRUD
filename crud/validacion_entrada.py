@@ -189,3 +189,34 @@ def validar_datos_empleado(empleado: EmpleadoBase):
     validar_pais_nacimiento(empleado.pais_nacimiento)
     validar_genero(empleado.genero)
     validar_estado_civil(empleado.estado_civil)
+
+
+def validar_actualizar_datos_empleado(
+    telefono: str = None,
+    correo_electronico: str = None,
+    calle: str = None,
+    numero_calle: str = None,
+    localidad: str = None,
+    partido: str = None,
+    provincia: str = None,
+):
+    if telefono:
+        validar_telefono(telefono)
+
+    if correo_electronico:
+        validar_correo_electronico(correo_electronico)
+
+    if calle:
+        validar_calle(calle)
+
+    if numero_calle:
+        validar_numero_calle(numero_calle)
+
+    if localidad:
+        validar_localidad(localidad)
+
+    if partido:
+        validar_partido(partido)
+
+    if provincia:
+        validar_provincia(provincia)

@@ -7,6 +7,8 @@ import cloudinary
 import cloudinary.uploader
 import psycopg2
 
+from crud import validacion_entrada
+
 db = Database()  # O como se llame tu clase
 db._initialize_pool()
 
@@ -238,18 +240,16 @@ class Empleado:
                 if cur.fetchone():
                     raise ValueError("El correo electrónico ya está en uso por otro empleado.")
 
-            # Validar provincia si se quiere actualizar
-            if provincia:
-                provincias_validas = [
-                    'Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
-                    'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa',
-                    'La Rioja', 'Mendoza', 'Misiones', 'Neuquén', 'Río Negro',
-                    'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
-                    'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
-                    'Ciudad Autónoma de Buenos Aires'
-                ]
-                if provincia not in provincias_validas:
-                    raise ValueError("Provincia inválida.")
+            #Valida si los formatos que tienen son validos
+            validacion_entrada.validar_actualizar_datos_empleado(
+                telefono,
+                correo_electronico,
+                calle,
+                numero_calle,
+                localidad,
+                partido,
+                provincia,
+            )
 
             # Armar consulta dinámica
             campos = []
