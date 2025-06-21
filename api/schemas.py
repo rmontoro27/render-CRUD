@@ -244,3 +244,9 @@ class ConceptoOutput(BaseModel):
     tipo_concepto: str
     valor_por_defecto: float | None
     es_porcentaje: bool
+
+class ConceptoUpdate(BaseModel):
+    descripcion: Optional[str] = None
+    tipo_concepto: Optional[str] = None
+    valor_por_defecto: Optional[float] = None
+    es_porcentaje: Optional[bool] = None

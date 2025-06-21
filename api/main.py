@@ -26,7 +26,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
-                      SalarioInput, ConceptoInput, ConceptoOutput)
+                      SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -770,3 +770,15 @@ def eliminar_concepto(codigo: str):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al eliminar concepto")
+
+@app.put("/api/conceptos/{codigo}")
+def modificar_concepto(codigo: str, datos: ConceptoUpdate):
+    try:
+        AdminCRUD.modificar_concepto(codigo, datos)
+        return {"mensaje": f"✏️ Concepto {codigo} modificado correctamente"}
+
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al modificar concepto")

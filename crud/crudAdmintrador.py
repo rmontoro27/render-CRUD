@@ -5,7 +5,7 @@ from .database import db
 from .crudEmpleado import Empleado
 from typing import Optional
 from typing import Tuple, List
-from api.schemas import EmpleadoResponse
+from api.schemas import EmpleadoResponse, ConceptoUpdate
 import cloudinary
 import cloudinary.uploader
 from cloudinary.uploader import upload as cloudinary_upload
@@ -965,3 +965,49 @@ class AdminCRUD:
             cur.execute("DELETE FROM concepto WHERE codigo = %s", (codigo,))
             conn.commit()
 
+    @staticmethod
+    def modificar_concepto(codigo: str, datos: ConceptoUpdate):
+        conceptos_validos = [
+            'Remunerativo', 'No remunerativo', 'Deducción', 'Retención',
+            'Percepción', 'Indemnización', 'Reintegro', 'Premio',
+            'Multa', 'Ajuste', 'Anticipo', 'Vacaciones'
+        ]
+
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+
+            # Verificar que el concepto exista
+            cur.execute("SELECT 1 FROM concepto WHERE codigo = %s", (codigo,))
+            if not cur.fetchone():
+                raise ValueError(f"No existe el concepto con código {codigo}")
+
+            # Armar la consulta dinámica según los campos enviados
+            campos = []
+            valores = []
+
+            if datos.descripcion is not None:
+                campos.append("descripcion = %s")
+                valores.append(datos.descripcion)
+
+            if datos.tipo_concepto is not None:
+                if datos.tipo_concepto not in conceptos_validos:
+                    raise ValueError(f"Tipo de concepto inválido: {datos.tipo_concepto}")
+                campos.append("tipo_concepto = %s")
+                valores.append(datos.tipo_concepto)
+
+            if datos.valor_por_defecto is not None:
+                campos.append("valor_por_defecto = %s")
+                valores.append(datos.valor_por_defecto)
+
+            if datos.es_porcentaje is not None:
+                campos.append("es_porcentaje = %s")
+                valores.append(datos.es_porcentaje)
+
+            if not campos:
+                raise ValueError("No se enviaron campos para actualizar")
+
+            valores.append(codigo)  # Para el WHERE
+
+            query = f"UPDATE concepto SET {', '.join(campos)} WHERE codigo = %s"
+            cur.execute(query, tuple(valores))
+            conn.commit()
