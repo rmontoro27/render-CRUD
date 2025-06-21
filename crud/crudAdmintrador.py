@@ -1054,38 +1054,26 @@ class AdminCRUD:
             if conn:
                 conn.close()
 
-
     @staticmethod
-    def actualizar_imagen_perfil2(image_bytes: bytes, usuario_id: int):
-        """
-        Sube una imagen a Cloudinary y actualiza la URL en la base de datos para el usuario indicado.
-
-        Args:
-            image_bytes: El contenido de la imagen en bytes
-            usuario_id: ID del empleado a actualizar
-
-        Returns:
-            URL segura de la imagen subida
-        """
-        conn = None
-        try:
-            # Subir a Cloudinary
-            result = cloudinary.uploader.upload(io.BytesIO(image_bytes), folder="perfiles")
-            image_url = result["secure_url"]
-
-            # Guardar en base de datos
-            conn = db.get_connection()
+    def obtener_cv(empleado_id: int):
+        with db.get_connection() as conn:
             cur = conn.cursor()
-            cur.execute(
-                "UPDATE empleado SET imagen_perfil_url = %s WHERE id_empleado = %s",
-                (image_url, usuario_id)
-            )
-            conn.commit()
-            return image_url
+            cur.execute("""
+                SELECT id_documento, tipo, archivo_asociado, descripcion, fecha_subida
+                FROM documento
+                WHERE id_empleado = %s AND tipo = 'CV'
+                ORDER BY fecha_subida DESC
+                LIMIT 1
+            """, (empleado_id,))
+            row = cur.fetchone()
 
-        except Exception as e:
-            raise Exception(f"Error al subir imagen: {e}")
+            if not row:
+                raise ValueError(f"No se encontró CV para el empleado {empleado_id}")
 
-        finally:
-            if conn:
-                conn.close()
+            return {
+                "id_documento": row[0],
+                "tipo": row[1],
+                "url": row[2],
+                "descripcion": row[3],
+                "fecha_subida": row[4].isoformat()
+            }

@@ -810,3 +810,13 @@ async def subir_cv(
     except Exception as e:
         print(f"❌ Error completo: {e}")  # <--- importante
         raise HTTPException(status_code=500, detail="Error al subir el CV")
+
+
+@app.get("/api/documentos/cv/{empleado_id}")
+def obtener_cv(empleado_id: int):
+    try:
+        return AdminCRUD.obtener_cv(empleado_id)
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al obtener el CV")
