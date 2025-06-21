@@ -789,6 +789,10 @@ async def subir_cv(
     archivo: UploadFile = File(...),
     empleado_id: int = Form(...),
     descripcion: str = Form(None)):
+
+    if not archivo.filename.lower().endswith(('.pdf')):
+        raise HTTPException(status_code=400, detail="Solo se permiten archivos PDF")
+
     try:
         contenido = await archivo.read()
 
