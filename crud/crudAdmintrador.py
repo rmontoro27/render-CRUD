@@ -1080,3 +1080,18 @@ class AdminCRUD:
                 "descripcion": row[3],
                 "fecha_subida": row[4].isoformat()
             }
+
+    @staticmethod
+    def tiene_vectores_faciales(id_empleado: int) -> bool:
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+
+            cur.execute("""
+                SELECT tipo_vector
+                FROM dato_biometrico_facial
+                WHERE id_empleado = %s
+            """, (id_empleado,))
+
+            vectores = {row[0] for row in cur.fetchall()}
+
+        return {'Neutro', 'Sonrisa', 'Giro'}.issubset(vectores)

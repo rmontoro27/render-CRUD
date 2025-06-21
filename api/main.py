@@ -819,3 +819,14 @@ def obtener_documento(empleado_id: int, tipo: str):
         raise HTTPException(status_code=500, detail=f"Error al obtener el {tipo}")
 
 
+@app.get("/api/biometrico/tiene-vector/{empleado_id}")
+def verificar_vectores(empleado_id: int):
+    try:
+        tiene = AdminCRUD.tiene_vectores_faciales(empleado_id)
+        return {"empleado_id": empleado_id, "tiene_vectores_completos": tiene}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al verificar vectores biométricos")
+
+
+
+
