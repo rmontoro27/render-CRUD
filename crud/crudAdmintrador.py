@@ -900,3 +900,35 @@ class AdminCRUD:
             """, (puesto_id, departamento_id, categoria_id, valor_por_defecto, fecha_inicio))
 
             conn.commit()
+
+    @staticmethod
+    def agregar_concepto(descripcion: str, tipo_concepto: str, valor_por_defecto: float, es_porcentaje: bool):
+        conceptos_validos = [
+            'Remunerativo', 'No remunerativo', 'Deducción', 'Retención',
+            'Percepción', 'Indemnización', 'Reintegro', 'Premio',
+            'Multa', 'Ajuste', 'Anticipo', 'Vacaciones'
+        ]
+
+        if tipo_concepto not in conceptos_validos:
+            raise ValueError(f"Tipo de concepto inválido: {tipo_concepto}")
+
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+
+            # Obtener último código insertado
+            cur.execute("SELECT codigo FROM concepto WHERE codigo LIKE 'C%' ORDER BY codigo DESC LIMIT 1")
+            ultimo = cur.fetchone()
+            if ultimo:
+                ultimo_num = int(ultimo[0][1:])  # Quita la "C" y convierte a int
+                nuevo_codigo = f"C{ultimo_num + 1:03d}"
+            else:
+                nuevo_codigo = "C001"
+
+            # Insertar el nuevo concepto
+            cur.execute("""
+                INSERT INTO concepto (codigo, descripcion, tipo_concepto, valor_por_defecto, es_porcentaje)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (nuevo_codigo, descripcion, tipo_concepto, valor_por_defecto, es_porcentaje))
+
+            conn.commit()
+

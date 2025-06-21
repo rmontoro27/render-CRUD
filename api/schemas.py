@@ -231,3 +231,9 @@ class SalarioInput(BaseModel):
     categoria_id: int
     valor_por_defecto: float
     fecha_inicio: str    
+
+class ConceptoInput(BaseModel):
+    descripcion: str
+    tipo_concepto: str
+    valor_por_defecto: Optional[float] = None
+    es_porcentaje: Optional[bool] = False

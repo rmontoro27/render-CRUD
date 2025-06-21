@@ -25,7 +25,8 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta,
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
-                      LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar, SalarioInput)
+                      LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
+                      SalarioInput, ConceptoInput)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -733,3 +734,19 @@ def actualizar_salario(datos: SalarioInput):
         raise HTTPException(status_code=500, detail="Error interno del servidor")
      
 
+@app.post("/api/conceptos/agregar")
+def agregar_concepto(datos: ConceptoInput):
+    try:
+        AdminCRUD.agregar_concepto(
+            datos.descripcion,
+            datos.tipo_concepto,
+            datos.valor_por_defecto,
+            datos.es_porcentaje
+        )
+        return {"mensaje": "✅ Concepto agregado correctamente"}
+
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
