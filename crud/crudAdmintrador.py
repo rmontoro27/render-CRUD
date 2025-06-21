@@ -932,3 +932,22 @@ class AdminCRUD:
 
             conn.commit()
 
+    @staticmethod
+    def listar_conceptos():
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT codigo, descripcion, tipo_concepto, valor_por_defecto, es_porcentaje FROM concepto ORDER BY codigo")
+            conceptos = cur.fetchall()
+
+        return [
+            {
+                "codigo": c[0],
+                "descripcion": c[1],
+                "tipo_concepto": c[2],
+                "valor_por_defecto": float(c[3]) if c[3] is not None else None,
+                "es_porcentaje": c[4]
+            }
+            for c in conceptos
+        ]
+

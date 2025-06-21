@@ -26,7 +26,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
-                      SalarioInput, ConceptoInput)
+                      SalarioInput, ConceptoInput, ConceptoOutput)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -750,3 +750,11 @@ def agregar_concepto(datos: ConceptoInput):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+
+@app.get("/api/conceptos/", response_model=list[ConceptoOutput])
+def listar_conceptos():
+    try:
+        return AdminCRUD.listar_conceptos()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al listar conceptos")
