@@ -1115,7 +1115,14 @@ class AdminCRUD:
             with db.get_connection() as conn:
 
                 cur = conn.cursor()
+            #corrobar si ya existe o no 
+            cur.execute("""
+            SELECT 1 FROM registro_jornada 
+            WHERE id_empleado = %s AND fecha = %s
+            """, (id_empleado, fecha))
 
+            if cur.fetchone():
+                raise ValueError("Ya existe una jornada registrada para ese empleado en esa fecha.")
             # 2. Obtener o crear el periodo
             cur.execute("SELECT obtener_o_crear_periodo_empleado(%s, %s);", (id_empleado, fecha))
             id_periodo = cur.fetchone()[0]

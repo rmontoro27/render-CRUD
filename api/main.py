@@ -847,6 +847,9 @@ def registrar_jornada(request: JornadaRequest):
             motivo=request.motivo
         )
         return {"mensaje": "Jornada registrada correctamente"}
+    
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
