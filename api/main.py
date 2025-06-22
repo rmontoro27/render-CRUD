@@ -883,7 +883,8 @@ def registrar_incidencia_asistencia_endpoint(datos: IncidenciaAsistenciaRequest)
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ve))
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno del servidor")
     
@@ -901,6 +902,8 @@ def registrar_asistencia_biometrica(datos: AsistenciaBiometricaRequest):
         return {"mensaje": "Asistencia biometrica registrada correctamente"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ve))
     except Exception as e:
         print("❌ Error en endpoint:", e)
         raise HTTPException(status_code=500, detail="Error interno del servidor")

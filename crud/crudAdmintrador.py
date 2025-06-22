@@ -1285,6 +1285,14 @@ class AdminCRUD:
         try:
             conn = db.get_connection()
             cur = conn.cursor()
+            #corrobar si ya existe o no 
+            cur.execute("""
+            SELECT 1 FROM incidencia_asistencia
+            WHERE id_empleado = %s AND fecha = %s
+            """, (id_empleado, fecha))
+
+            if cur.fetchone():
+                raise ValueError("Ya existe una incidencia registrada para ese empleado en esa fecha.")
 
             # 2. Obtener o crear el periodo
             cur.execute("SELECT obtener_o_crear_periodo_empleado(%s, %s);", (id_empleado, fecha))
@@ -1316,6 +1324,7 @@ class AdminCRUD:
             if conn:
                 conn.rollback()
             print("❌ Error al registrar incidencia:", e)
+            raise e
 
         finally:
             if cur:
@@ -1337,6 +1346,15 @@ class AdminCRUD:
         try:
             conn = db.get_connection()
             cur = conn.cursor()
+            
+            #corrobar si ya existe o no 
+            cur.execute("""
+            SELECT 1 FROM asistencia_biometrica
+            WHERE id_empleado = %s AND fecha = %s AND tipo = %s
+            """, (id_empleado, fecha,tipo))
+
+            if cur.fetchone():
+                raise ValueError(f"Ya existe una asistencia registrada de tipo {tipo} para ese empleado en esa fecha.")
 
             # 2. Obtener o crear el periodo
             cur.execute("SELECT obtener_o_crear_periodo_empleado(%s, %s);", (id_empleado, fecha))
@@ -1380,6 +1398,7 @@ class AdminCRUD:
             if 'conn' in locals():
                 conn.rollback()
             print("❌ Error al registrar asistencia biometrica:", e)
+            raise e
 
         finally:
             if 'cur' in locals():
