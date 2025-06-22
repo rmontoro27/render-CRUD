@@ -37,6 +37,8 @@ import cloudinary.uploader
 from fastapi import UploadFile, File, Form
 from fastapi.responses import FileResponse
 import traceback
+from utils.correos import generar_codigo_verificacion, enviar_codigo_verificacion
+
 
 
 
@@ -156,11 +158,15 @@ def crear_empleado(empleado: EmpleadoBase):
 @app.post("/crear-empleado/")
 def crear_empleado(request: EmpleadoBase):
     try:
-        id_empleado = AdminCRUD.crear_empleado(request)
+        empleado = AdminCRUD.crear_empleado(request)
+
+        # Generar y enviar código solo si se creó bien
+        codigo = generar_codigo_verificacion()
+        enviar_codigo_verificacion(empleado['nombre'], empleado['correo_electronico'], codigo)
 
         return {
             "mensaje": "Empleado creado correctamente",
-            "id_empleado": id_empleado
+            "id_empleado": empleado
         }
 
     except ValueError as e:
@@ -170,6 +176,7 @@ def crear_empleado(request: EmpleadoBase):
         import traceback
         print("[ERROR] Error inesperado:\n", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+
 
 @app.get("/empleados/{numero_identificacion}")
 def obtener_empleado(numero_identificacion: str):
