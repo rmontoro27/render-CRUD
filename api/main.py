@@ -158,15 +158,16 @@ def crear_empleado(empleado: EmpleadoBase):
 @app.post("/crear-empleado/")
 def crear_empleado(request: EmpleadoBase):
     try:
-        empleado = AdminCRUD.crear_empleado(request)
+
+        #empleado = AdminCRUD.crear_empleado(request)
 
         # Generar y enviar código solo si se creó bien
-        codigo = generar_codigo_verificacion()
-        enviar_codigo_verificacion(empleado['nombre'], empleado['correo_electronico'], codigo)
+        #codigo = generar_codigo_verificacion()
+        #enviar_codigo_verificacion(empleado['nombre'], empleado['correo_electronico'], codigo)
 
         return {
             "mensaje": "Empleado creado correctamente",
-            "id_empleado": empleado
+        #    "id_empleado": empleado
         }
 
     except ValueError as e:
