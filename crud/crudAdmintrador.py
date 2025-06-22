@@ -194,6 +194,37 @@ class AdminCRUD:
                 db.return_connection(conn)
 
     @staticmethod
+    def obtener_empleado_por_id(id_empleado):
+        """Obtiene la información básica de un empleado por su ID"""
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                """
+                SELECT id_empleado, numero_identificacion, nombre, apellido,
+                       correo_electronico, telefono, imagen_perfil_url
+                FROM empleado
+                WHERE id_empleado = %s
+                """,
+                (id_empleado,)
+            )
+            row = cur.fetchone()
+            if row:
+                return {
+                    "id_empleado": row[0],
+                    "numero_identificacion": row[1],
+                    "nombre": row[2],
+                    "apellido": row[3],
+                    "correo": row[4],
+                    "telefono": row[5],
+                    "imagen_perfil_url": row[6]
+                }
+            return None
+        finally:
+            if conn:
+                db.return_connection(conn)
+
+    @staticmethod
     def obtener_detalle_empleado(numero_identificacion: str):
         """Obtiene todos los datos de un empleado"""
         try:
