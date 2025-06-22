@@ -283,3 +283,15 @@ class AsistenciaBiometricaRequest(BaseModel):
     hora: time
     estado_asistencia: str
     turno_asistencia: str
+    
+class PuestoInput(BaseModel):
+    nombre: str 
+
+
+class DepartamentoInput(BaseModel):
+    nombre: str 
+    descripcion: str 
+
+
+class CategoriaInput(BaseModel):
+    nombre_categoria: str 

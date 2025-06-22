@@ -27,7 +27,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
                       SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest,
-                      JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest)
+                      JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest,PuestoInput, CategoriaInput,DepartamentoInput)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -919,14 +919,13 @@ def registrar_asistencia_biometrica(datos: AsistenciaBiometricaRequest):
     
 #PUESTOS
 @app.post("/api/puestos/agregar")
-def agregar_puesto(nombre: str = Body(..., embed=True)):
+def agregar_puesto(datos: PuestoInput):
     try:
-        AdminCRUD.agregar_puesto(nombre)
+        AdminCRUD.agregar_puesto(datos.nombre)
         return {"mensaje": "✅ Puesto agregado correctamente"}
-
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
-    except ValueError as ve:
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ValueError as ve:  
         raise HTTPException(status_code=409, detail=str(ve))
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno del servidor")
@@ -950,16 +949,16 @@ def eliminar_puesto(id_puesto: int):
 
 #DEPARTAMENTOS
 @app.post("/api/departamentos/agregar")
-def agregar_departamento(nombre: str = Body(...), descripcion: str = Body(...)):
+def agregar_departamento(datos: DepartamentoInput):
     try:
-        AdminCRUD.agregar_departamento(nombre, descripcion)
+        AdminCRUD.agregar_departamento(datos.nombre, datos.descripcion)
         return {"mensaje": "✅ Departamento agregado correctamente"}
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as ve:
         raise HTTPException(status_code=409, detail=str(ve))
     except Exception:
-        raise HTTPException(status_code=500, detail="Error interno al agregar departamento")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @app.get("/api/departamentos/")
 def obtener_departamentos():
@@ -980,16 +979,16 @@ def eliminar_departamento(id_departamento: int):
 
 #CATEGORIAS  
 @app.post("/api/categorias/agregar")
-def agregar_categoria(nombre: str = Body(..., embed=True)):
+def agregar_categoria(datos: CategoriaInput):
     try:
-        AdminCRUD.agregar_categoria(nombre)
+        AdminCRUD.agregar_categoria(datos.nombre_categoria)
         return {"mensaje": "✅ Categoría agregada correctamente"}
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except ValueError as ve:
         raise HTTPException(status_code=409, detail=str(ve))
     except Exception:
-        raise HTTPException(status_code=500, detail="Error interno al agregar categoría")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @app.get("/api/categorias/")
 def obtener_categorias():
