@@ -912,8 +912,16 @@ class AdminCRUD:
         if tipo_concepto not in conceptos_validos:
             raise ValueError(f"Tipo de concepto inválido: {tipo_concepto}")
 
-        with db.get_connection() as conn:
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
             cur = conn.cursor()
+
+            # Corrobar si ya existe el concepto con ese nombre
+            cur.execute("SELECT 1 FROM concepto WHERE descripcion = %s", (descripcion,))
+            if cur.fetchone():
+                raise ValueError("Ya existe un concepto agregado con dicho nombre.")
 
             # Obtener último código insertado
             cur.execute("SELECT codigo FROM concepto WHERE codigo LIKE 'C%' ORDER BY codigo DESC LIMIT 1")
@@ -924,13 +932,23 @@ class AdminCRUD:
             else:
                 nuevo_codigo = "C001"
 
-            # Insertar el nuevo concepto
-            cur.execute("""
-                INSERT INTO concepto (codigo, descripcion, tipo_concepto, valor_por_defecto, es_porcentaje)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (nuevo_codigo, descripcion, tipo_concepto, valor_por_defecto, es_porcentaje))
-
+            # Insertar nuevo concepto
+            cur.execute(
+                "INSERT INTO concepto (codigo, descripcion, tipo_concepto, valor_por_defecto, es_porcentaje) VALUES (%s, %s, %s, %s, %s)",
+                (nuevo_codigo, descripcion, tipo_concepto, valor_por_defecto, es_porcentaje)
+            )
             conn.commit()
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e
+
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
 
     @staticmethod
     def listar_conceptos():

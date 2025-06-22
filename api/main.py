@@ -749,7 +749,8 @@ def agregar_concepto(datos: ConceptoInput):
 
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
-
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error interno del servidor")
 
