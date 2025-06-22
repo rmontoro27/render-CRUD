@@ -3,13 +3,14 @@ import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 from crud.crudAdmintrador import AdminCRUD
+import random
+import string
 
 
 load_dotenv()
 
-EMAIL_ORIGEN = os.getenv("miraisolutions@gmail.com")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-
+EMAIL_ORIGEN="miraihrsolutions@gmail.com"
+EMAIL_PASSWORD="kdnd cxvo piou kvob"
 
 def enviar_notificacion_pago(nombre, correo, periodo, sueldo_neto, fecha_pago):
     cuerpo = f"""
@@ -47,6 +48,34 @@ def enviar_correo_generico(tipo, id_empleado, mensaje):
     msg['Subject'] = asunto
     msg['From'] = EMAIL_ORIGEN
     msg['To'] = empleado.correo
+
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.starttls()
+        server.login(EMAIL_ORIGEN, EMAIL_PASSWORD)
+        server.send_message(msg)
+
+
+def generar_codigo_verificacion(longitud=6):
+    """Genera un código de verificación alfanumérico."""
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=longitud))
+
+
+def enviar_codigo_verificacion(nombre, correo, codigo):
+    cuerpo = f"""
+    Hola {nombre},
+
+    Tu código de verificación es: {codigo}
+
+    Por favor, ingresalo en el sistema para completar el registro.
+
+    Saludos,  
+    Equipo de Mirai Solutions
+    """
+
+    msg = MIMEText(cuerpo)
+    msg['Subject'] = 'Código de Verificación - Mirai Solutions'
+    msg['From'] = EMAIL_ORIGEN
+    msg['To'] = correo
 
     with smtplib.SMTP('smtp.gmail.com', 587) as server:
         server.starttls()
