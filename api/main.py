@@ -916,13 +916,15 @@ def registrar_asistencia_biometrica(datos: AsistenciaBiometricaRequest):
         print("❌ Error en endpoint:", e)
         raise HTTPException(status_code=500, detail="Error interno del servidor")
     
-#puestos, salarios, categorias
+#PUESTOS
 @app.post("/api/puestos/agregar")
 def agregar_puesto(nombre: str = Body(..., embed=True)):
     try:
         AdminCRUD.agregar_puesto(nombre)
         return {"mensaje": "✅ Puesto agregado correctamente"}
 
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except ValueError as ve:
         raise HTTPException(status_code=409, detail=str(ve))
     except Exception:
@@ -944,12 +946,15 @@ def eliminar_puesto(id_puesto: int):
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno al eliminar puesto")
-    
+
+#DEPARTAMENTOS
 @app.post("/api/departamentos/agregar")
 def agregar_departamento(nombre: str = Body(...), descripcion: str = Body(...)):
     try:
         AdminCRUD.agregar_departamento(nombre, descripcion)
         return {"mensaje": "✅ Departamento agregado correctamente"}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except ValueError as ve:
         raise HTTPException(status_code=409, detail=str(ve))
     except Exception:
@@ -971,12 +976,15 @@ def eliminar_departamento(id_departamento: int):
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno al eliminar departamento")
-    
+
+#CATEGORIAS  
 @app.post("/api/categorias/agregar")
 def agregar_categoria(nombre: str = Body(..., embed=True)):
     try:
         AdminCRUD.agregar_categoria(nombre)
         return {"mensaje": "✅ Categoría agregada correctamente"}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
     except ValueError as ve:
         raise HTTPException(status_code=409, detail=str(ve))
     except Exception:
