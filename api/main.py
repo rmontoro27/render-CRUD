@@ -908,3 +908,86 @@ def registrar_asistencia_biometrica(datos: AsistenciaBiometricaRequest):
     except Exception as e:
         print("❌ Error en endpoint:", e)
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+    
+#puestos, salarios, categorias
+@app.post("/api/puestos/agregar")
+def agregar_puesto(nombre: str = Body(..., embed=True)):
+    try:
+        AdminCRUD.agregar_puesto(nombre)
+        return {"mensaje": "✅ Puesto agregado correctamente"}
+
+    except ValueError as ve:
+        raise HTTPException(status_code=409, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+@app.get("/api/puestos/")
+def obtener_puestos():
+    try:
+        return AdminCRUD.listar_puestos()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al obtener los puestos")
+
+@app.delete("/api/puestos/{id_puesto}")
+def eliminar_puesto(id_puesto: int):
+    try:
+        AdminCRUD.eliminar_puesto(id_puesto)
+        return {"mensaje": "✅ Puesto eliminado correctamente"}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno al eliminar puesto")
+    
+@app.post("/api/departamentos/agregar")
+def agregar_departamento(nombre: str = Body(...), descripcion: str = Body(...)):
+    try:
+        AdminCRUD.agregar_departamento(nombre, descripcion)
+        return {"mensaje": "✅ Departamento agregado correctamente"}
+    except ValueError as ve:
+        raise HTTPException(status_code=409, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno al agregar departamento")
+
+@app.get("/api/departamentos/")
+def obtener_departamentos():
+    try:
+        return AdminCRUD.listar_departamentos()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al obtener los departamentos")
+
+@app.delete("/api/departamentos/{id_departamento}")
+def eliminar_departamento(id_departamento: int):
+    try:
+        AdminCRUD.eliminar_departamento(id_departamento)
+        return {"mensaje": "✅ Departamento eliminado correctamente"}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno al eliminar departamento")
+    
+@app.post("/api/categorias/agregar")
+def agregar_categoria(nombre: str = Body(..., embed=True)):
+    try:
+        AdminCRUD.agregar_categoria(nombre)
+        return {"mensaje": "✅ Categoría agregada correctamente"}
+    except ValueError as ve:
+        raise HTTPException(status_code=409, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno al agregar categoría")
+
+@app.get("/api/categorias/")
+def obtener_categorias():
+    try:
+        return AdminCRUD.listar_categorias()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al obtener las categorías")
+
+@app.delete("/api/categorias/{id_categoria}")
+def eliminar_categoria(id_categoria: int):
+    try:
+        AdminCRUD.eliminar_categoria(id_categoria)
+        return {"mensaje": "✅ Categoría eliminada correctamente"}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno al eliminar categoría")

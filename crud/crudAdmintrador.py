@@ -1455,4 +1455,197 @@ class AdminCRUD:
                 cur.close()
             if 'conn' in locals():
                 conn.close()
-        
+
+#METODOS para listar, obtener y eliminar categorias, puestos, departamentos
+  # ----------- PUESTO -----------
+
+    @staticmethod
+    def agregar_puesto(nombre: str):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM puesto WHERE nombre = %s", (nombre,))
+            if cur.fetchone():
+                raise ValueError("Ya existe un puesto con ese nombre.")
+            cur.execute("INSERT INTO puesto (nombre) VALUES (%s)", (nombre,))
+            conn.commit()
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def listar_puestos():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id_puesto, nombre FROM puesto ORDER BY id_puesto ASC")
+            rows = cur.fetchall()
+            return [{"id": row[0], "nombre": row[1]} for row in rows]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def eliminar_puesto(id_puesto: int):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM puesto WHERE id_puesto = %s", (id_puesto,))
+            if not cur.fetchone():
+                raise ValueError("El puesto no existe.")
+            cur.execute("DELETE FROM puesto WHERE id_puesto = %s", (id_puesto,))
+            conn.commit()
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+ # ----------- DEPARTAMENTO -----------
+
+    @staticmethod
+    def agregar_departamento(nombre: str, descripcion: str):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+
+            cur.execute("SELECT 1 FROM departamento WHERE nombre = %s", (nombre,))
+            if cur.fetchone():
+                raise ValueError("Ya existe un departamento con ese nombre.")
+
+            cur.execute(
+                "INSERT INTO departamento (nombre, descripcion) VALUES (%s, %s)",
+                (nombre, descripcion)
+            )
+            conn.commit()
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e
+
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def listar_departamentos():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id_departamento, nombre, descripcion FROM departamento ORDER BY id_departamento ASC")
+            rows = cur.fetchall()
+            return [{"id": row[0], "nombre": row[1], "descripcion": row[2]} for row in rows]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def eliminar_departamento(id_departamento: int):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM departamento WHERE id_departamento = %s", (id_departamento,))
+            if not cur.fetchone():
+                raise ValueError("El departamento no existe.")
+            cur.execute("DELETE FROM departamento WHERE id_departamento = %s", (id_departamento,))
+            conn.commit()
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+   # ----------- CATEGORIA -----------
+
+    @staticmethod
+    def agregar_categoria(nombre: str):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM categoria WHERE nombre_categoria = %s", (nombre,))
+            if cur.fetchone():
+                raise ValueError("Ya existe una categoría con ese nombre.")
+            cur.execute("INSERT INTO categoria (nombre_categoria) VALUES (%s)", (nombre,))
+            conn.commit()
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def listar_categorias():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT id_categoria, nombre_categoria FROM categoria ORDER BY id_categoria ASC")
+            rows = cur.fetchall()
+            return [{"id": row[0], "nombre": row[1]} for row in rows]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def eliminar_categoria(id_categoria: int):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT 1 FROM categoria WHERE id_categoria = %s", (id_categoria,))
+            if not cur.fetchone():
+                raise ValueError("La categoría no existe.")
+            cur.execute("DELETE FROM categoria WHERE id_categoria = %s", (id_categoria,))
+            conn.commit()
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
