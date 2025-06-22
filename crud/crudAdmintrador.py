@@ -697,6 +697,16 @@ class AdminCRUD:
             updates = []
             params = []
 
+            validacion_entrada.validar_actualizar_datos_empleado(
+                telefono,
+                correo_electronico,
+                calle,
+                numero_calle,
+                localidad,
+                partido,
+                provincia
+            )
+
             if telefono is not None:
                 updates.append("telefono = %s")
                 params.append(telefono)
@@ -729,15 +739,6 @@ class AdminCRUD:
                 params.append(partido)
 
             if provincia is not None:
-                # Validar provincia
-                provincias_validas = ['Buenos Aires', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba',
-                                      'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa',
-                                      'La Rioja', 'Mendoza', 'Misiones', 'Neuquén', 'Río Negro',
-                                      'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
-                                      'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
-                                      'Ciudad Autónoma de Buenos Aires']
-                if provincia not in provincias_validas:
-                    raise ValueError(f"Provincia inválida. Opciones válidas: {provincias_validas}")
                 updates.append("provincia = %s")
                 params.append(provincia)
 
