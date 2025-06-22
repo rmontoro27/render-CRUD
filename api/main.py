@@ -27,7 +27,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
                       SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest,
-                      JornadaParcialRequest, IncidenciaAsistenciaRequest)
+                      JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -885,4 +885,22 @@ def registrar_incidencia_asistencia_endpoint(datos: IncidenciaAsistenciaRequest)
         raise HTTPException(status_code=400, detail=str(e))
 
     except Exception:
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
+    
+@app.post("/registrar-asistenciaBiometrica/")
+def registrar_asistencia_biometrica(datos: AsistenciaBiometricaRequest):
+    try: 
+        AdminCRUD.registrar_asistencia_biometrica(
+            id_empleado=datos.id_empleado,
+            fecha=datos.fecha,
+            tipo=datos.tipo,
+            hora=datos.hora,
+            estado_asistencia=datos.estado_asistencia,
+            turno_asistencia=datos.turno_asistencia
+        )
+        return {"mensaje": "Asistencia biometrica registrada correctamente"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        print("❌ Error en endpoint:", e)
         raise HTTPException(status_code=500, detail="Error interno del servidor")

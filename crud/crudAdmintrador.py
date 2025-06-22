@@ -1200,6 +1200,7 @@ class AdminCRUD:
             if 'conn' in locals():
                 conn.rollback()
             print("❌ Error al registrar jornada:", e)
+            raise e
 
         finally:
             if 'cur' in locals():
@@ -1321,3 +1322,68 @@ class AdminCRUD:
                 cur.close()
             if conn:
                 conn.close()
+    
+    @staticmethod
+    def registrar_asistencia_biometrica(
+        id_empleado,
+        fecha,
+        tipo,
+        hora,
+        estado_asistencia,
+        turno_asistencia  
+    ):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+
+            # 2. Obtener o crear el periodo
+            cur.execute("SELECT obtener_o_crear_periodo_empleado(%s, %s);", (id_empleado, fecha))
+            id_periodo = cur.fetchone()[0]
+            
+            #obtenemos el puesto
+            cur.execute("SELECT id_puesto FROM informacion_laboral WHERE id_empleado= %s;", (id_empleado,))
+            puesto_resultado = cur.fetchone()
+            if not puesto_resultado:
+                raise ValueError("El empleado no tiene información laboral registrada.")
+            id_puesto = puesto_resultado[0]
+
+
+            # 3. Insertar en incidencia_asistencia
+            cur.execute("""
+            INSERT INTO asistencia_biometrica (
+            id_empleado,
+            id_periodo,
+            id_puesto,
+            fecha,
+            tipo,
+            hora,
+            estado_asistencia,
+            turno_asistencia
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            id_empleado,
+            id_periodo,
+            id_puesto,
+            fecha,
+            tipo,
+            hora,
+            estado_asistencia,
+            turno_asistencia
+        ))
+
+            conn.commit()
+            print("✅ asistencia biometrica registrada correctamente")
+
+        except Exception as e:
+            if 'conn' in locals():
+                conn.rollback()
+            print("❌ Error al registrar asistencia biometrica:", e)
+
+        finally:
+            if 'cur' in locals():
+                cur.close()
+            if 'conn' in locals():
+                conn.close()
+        

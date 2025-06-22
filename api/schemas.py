@@ -275,3 +275,11 @@ class IncidenciaAsistenciaRequest(BaseModel):
     dia: str
     tipo: str
     descripcion: str
+    
+class AsistenciaBiometricaRequest(BaseModel):
+    id_empleado: int
+    fecha: date
+    tipo: str
+    hora: time
+    estado_asistencia: str
+    turno_asistencia: str
