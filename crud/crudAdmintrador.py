@@ -1649,3 +1649,40 @@ class AdminCRUD:
                 cur.close()
             if conn:
                 conn.close()
+#configuracion de asistencias
+    @staticmethod
+    def listar_configuraciones_asistencia():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT clave, valor, descripcion FROM configuracion_asistencia ORDER BY clave ASC")
+            rows = cur.fetchall()
+            return [{"clave": row[0], "valor": str(row[1]), "descripcion": row[2]} for row in rows]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+                
+    @staticmethod
+    def actualizar_configuracion_asistencia(clave: str, nuevo_valor: str):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+
+            cur.execute("SELECT 1 FROM configuracion_asistencia WHERE clave = %s", (clave,))
+            if not cur.fetchone():
+                raise ValueError("Configuración no encontrada")
+
+            cur.execute("UPDATE configuracion_asistencia SET valor = %s WHERE clave = %s", (nuevo_valor, clave))
+            conn.commit()
+            return {"mensaje": "Configuración actualizada"}
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()

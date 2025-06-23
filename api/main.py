@@ -27,7 +27,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
                       SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest,
-                      JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest,PuestoInput, CategoriaInput,DepartamentoInput)
+                      JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest,PuestoInput, CategoriaInput,DepartamentoInput,ConfigAsistenciaUpdate)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -1001,3 +1001,20 @@ def eliminar_categoria(id_categoria: int):
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno al eliminar categoría")
+
+#configuracion de asistencias
+@app.get("/api/configuracion-asistencia/")
+def obtener_configuracion_asistencia():
+    try:
+        return AdminCRUD.listar_configuraciones_asistencia()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al obtener las configuraciones")
+
+@app.put("/api/configuracion-asistencia/")
+def actualizar_configuracion_asistencia(datos: ConfigAsistenciaUpdate):
+    try:
+        return AdminCRUD.actualizar_configuracion_asistencia(datos.valor)
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al actualizar la configuración")

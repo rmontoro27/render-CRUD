@@ -295,3 +295,7 @@ class DepartamentoInput(BaseModel):
 
 class CategoriaInput(BaseModel):
     nombre_categoria: str 
+    
+
+class ConfigAsistenciaUpdate(BaseModel):
+    valor: str  
