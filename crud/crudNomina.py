@@ -150,7 +150,21 @@ class NominaCRUD:
                 cur.execute("SELECT * FROM nomina WHERE id_nomina = %s", (id_nomina,))
                 row = cur.fetchone()
                 columns = [desc[0] for desc in cur.description]
-                return dict(zip(columns, row))
+                nomina_dict = dict(zip(columns, row))
+
+                # Agregar campo periodo
+                cur.execute("""
+                    SELECT periodo_texto 
+                    FROM periodo_empleado 
+                    WHERE id_periodo = %s
+                """, (id_periodo,))
+                periodo_row = cur.fetchone()
+                if periodo_row:
+                    nomina_dict['periodo'] = periodo_row[0]
+
+                return nomina_dict
+
+
 
             except psycopg2.Error as e:
                 if conn:
