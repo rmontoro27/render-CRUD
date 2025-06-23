@@ -73,11 +73,6 @@ class AsistenciaManual(BaseModel):
     hora: time
     estado_asistencia: Optional[str] = None
 
-class CalculoNominaRequest(BaseModel):
-    id_empleado: int
-    periodo: str
-    fecha_calculo: str = Field(default_factory=lambda: datetime.now().strftime('%Y-%m-%d'))
-
 
 app = FastAPI()
 
