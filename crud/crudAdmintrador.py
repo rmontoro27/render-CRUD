@@ -1490,7 +1490,7 @@ class AdminCRUD:
             cur = conn.cursor()
             cur.execute("SELECT id_puesto, nombre FROM puesto ORDER BY id_puesto ASC")
             rows = cur.fetchall()
-            return [{"id": row[0], "nombre": row[1]} for row in rows]
+            return [{"id_puesto": row[0], "nombre": row[1]} for row in rows]
         finally:
             if cur:
                 cur.close()
@@ -1559,7 +1559,7 @@ class AdminCRUD:
             cur = conn.cursor()
             cur.execute("SELECT id_departamento, nombre, descripcion FROM departamento ORDER BY id_departamento ASC")
             rows = cur.fetchall()
-            return [{"id": row[0], "nombre": row[1], "descripcion": row[2]} for row in rows]
+            return [{"id_departamento": row[0], "nombre": row[1], "descripcion": row[2]} for row in rows]
         finally:
             if cur:
                 cur.close()
