@@ -1757,3 +1757,63 @@ class AdminCRUD:
                 cur.close()
             if conn:
                 conn.close()
+
+    @staticmethod
+    def listar_partidos_por_provincia(codigo_provincia: int = None):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            if codigo_provincia is None:
+                cur.execute("SELECT codigo_partido, codigo_provincia, nombre FROM partido ORDER BY nombre")
+            else:
+                cur.execute(
+                    "SELECT codigo_partido, codigo_provincia, nombre FROM partido WHERE codigo_provincia = %s ORDER BY nombre",
+                    (codigo_provincia,)
+                )
+            filas = cur.fetchall()
+            return [
+                {
+                    "codigo_partido": fila[0],
+                    "codigo_provincia": fila[1],
+                    "nombre": fila[2],
+                }
+                for fila in filas
+            ]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def listar_localidades_por_provincia(codigo_provincia: int = None):
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            if codigo_provincia is None:
+                cur.execute(
+                    "SELECT codigo_localidad, codigo_provincia, nombre FROM localidad ORDER BY nombre"
+                )
+            else:
+                cur.execute(
+                    "SELECT codigo_localidad, codigo_provincia, nombre FROM localidad WHERE codigo_provincia = %s ORDER BY nombre",
+                    (codigo_provincia,),
+                )
+            filas = cur.fetchall()
+            return [
+                {
+                    "codigo_localidad": fila[0],
+                    "codigo_provincia": fila[1],
+                    "nombre": fila[2],
+                }
+                for fila in filas
+            ]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()

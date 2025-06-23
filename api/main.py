@@ -1047,3 +1047,19 @@ def obtener_partidos():
         return AdminCRUD.listar_partidos()
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al obtener partidos")
+
+
+@app.get("/api/partidos-filtrado/")
+def obtener_partidos_por_provincia(codigo_provincia: int = None):
+    try:
+        return AdminCRUD.listar_partidos_por_provincia(codigo_provincia)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al obtener partidos")
+
+
+@app.get("/api/localidades-filtrado/")
+def obtener_localidades_por_provincia(codigo_provincia: int = None):
+    try:
+        return AdminCRUD.listar_localidades_por_provincia(codigo_provincia)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al obtener localidades")
