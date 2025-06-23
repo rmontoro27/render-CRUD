@@ -298,4 +298,18 @@ class CategoriaInput(BaseModel):
     
 
 class ConfigAsistenciaUpdate(BaseModel):
-    valor: str  
+    valor: str 
+    
+class InformacionLaboralCreate(BaseModel):
+    id_empleado: int
+    id_departamento: int
+    id_puesto: int
+    id_categoria: int
+    fecha_ingreso: str
+    turno: str
+    hora_inicio_turno: str
+    hora_fin_turno: str
+    cantidad_horas_trabajo: int
+    tipo_contrato: str
+    estado: str
+    tipo_semana_laboral: str

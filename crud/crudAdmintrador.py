@@ -1817,3 +1817,73 @@ class AdminCRUD:
                 cur.close()
             if conn:
                 conn.close()
+##Agregar informacion laboral
+    @staticmethod
+    def agregar_informacion_laboral(
+        id_empleado: int,
+        id_departamento: int,
+        id_puesto: int,
+        id_categoria: int,
+        fecha_ingreso: str,
+        turno: str,
+        hora_inicio_turno: str,
+        hora_fin_turno: str,
+        cantidad_horas_trabajo: int,
+        tipo_contrato: str,
+        estado: str,
+        tipo_semana_laboral: str
+    ):
+        try:
+            with db.get_connection() as conn:
+                cur = conn.cursor()
+
+                # Verificar si el empleado ya tiene información laboral registrada
+                cur.execute("SELECT 1 FROM informacion_laboral WHERE id_empleado = %s", (id_empleado,))
+                if cur.fetchone():
+                    raise ValueError("El empleado ya tiene información laboral registrada.")
+
+                # Insertar la nueva información
+                cur.execute("""
+                    INSERT INTO informacion_laboral (
+                        id_empleado,
+                        id_departamento,
+                        id_puesto,
+                        id_categoria,
+                        fecha_ingreso,
+                        turno,
+                        hora_inicio_turno,
+                        hora_fin_turno,
+                        cantidad_horas_trabajo,
+                        tipo_contrato,
+                        estado,
+                        tipo_semana_laboral
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    id_empleado,
+                    id_departamento,
+                    id_puesto,
+                    id_categoria,
+                    fecha_ingreso,
+                    turno,
+                    hora_inicio_turno,
+                    hora_fin_turno,
+                    cantidad_horas_trabajo,
+                    tipo_contrato,
+                    estado,
+                    tipo_semana_laboral
+                ))
+
+                conn.commit()
+                return {"mensaje": "Información laboral registrada correctamente"}
+
+        except Exception as e:
+            if 'conn' in locals():
+                conn.rollback()
+            print("❌ Error al agregar informaicon laboral:", e)
+            raise e
+
+        finally:
+            if 'cur' in locals():
+                cur.close()
+            if 'conn' in locals():
+                conn.close()
