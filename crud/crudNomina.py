@@ -19,7 +19,10 @@ class NominaCRUD:
                 conn = db.get_connection()
                 cur = conn.cursor()
 
-                fecha_calculo_dt = datetime.strptime(fecha_calculo, '%Y-%m-%d').date()
+                if isinstance(fecha_calculo, str):
+                    fecha_calculo_dt = datetime.strptime(fecha_calculo, '%Y-%m-%d').date()
+                else:
+                    fecha_calculo_dt = fecha_calculo  # ya es date
                 fecha_de_pago = fecha_calculo_dt + timedelta(days=7)
 
                 # Obtener id_periodo y presentismo
