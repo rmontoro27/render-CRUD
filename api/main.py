@@ -155,7 +155,7 @@ def crear_empleado(empleado: EmpleadoBase):
 def crear_empleado(request: EmpleadoBase):
     try:
 
-        #empleado = AdminCRUD.crear_empleado(request)
+        empleado = AdminCRUD.crear_empleado(request)
 
         # Generar y enviar código solo si se creó bien
         #codigo = generar_codigo_verificacion()
@@ -163,7 +163,7 @@ def crear_empleado(request: EmpleadoBase):
 
         return {
             "mensaje": "Empleado creado correctamente",
-        #    "id_empleado": empleado
+            "id_empleado": empleado
         }
 
     except ValueError as e:
