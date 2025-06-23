@@ -28,7 +28,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
                       SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest,
                       JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest,PuestoInput, CategoriaInput,DepartamentoInput,
-                      ConfigAsistenciaUpdate, InformacionLaboral, modificarInformacionLaboral)
+                      ConfigAsistenciaUpdate, InformacionLaboral)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
