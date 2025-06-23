@@ -1096,18 +1096,18 @@ def obtener_info_laboral_completa(id_empleado: int):
         info = AdminCRUD.buscar_informacion_laboral_completa_por_id_empleado(id_empleado)
         if info:
             return {
-                "id_departamento": info[1],
-                "id_puesto": info[2],
-                "id_categoria": info[3],
-                "fecha_ingreso": info[4].strftime('%Y-%m-%d'),
-                "turno": info[5],
-                "hora_inicio_turno": str(info[6]),
-                "hora_fin_turno": str(info[7]),
-                "cantidad_horas_trabajo": info[8],
-                "tipo_contrato": info[9],
-                "estado": info[10],
-                "tipo_semana_laboral": info[11]
-            }
+                "id_departamento": info[0],
+                "id_puesto": info[1],
+                "id_categoria": info[2],
+                "fecha_ingreso": info[3].strftime('%Y-%m-%d'),  # Fecha en índice 3
+                "turno": info[4],
+                "hora_inicio_turno": str(info[5]),
+                "hora_fin_turno": str(info[6]),
+                "cantidad_horas_trabajo": info[7],
+                "tipo_contrato": info[8],
+                "estado": info[9],
+                "tipo_semana_laboral": info[10]
+                }       
         raise HTTPException(status_code=404, detail="No encontrado")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

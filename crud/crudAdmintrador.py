@@ -1890,18 +1890,6 @@ class AdminCRUD:
 
     @staticmethod
     def buscar_informacion_laboral_completa_por_id_empleado(id_empleado: int):
-        """
-        Busca la información laboral completa de un empleado por su ID.
-
-        Args:
-            id_empleado: ID del empleado a buscar
-
-        Returns:
-            Tupla con todos los campos necesarios o None si no se encuentra.
-            (id_empleado, id_departamento, id_puesto, id_categoria, fecha_ingreso,
-            turno, hora_inicio_turno, hora_fin_turno, cantidad_horas_trabajo,
-            tipo_contrato, estado, tipo_semana_laboral)
-        """
         try:
             conn = db.get_connection()
             cur = conn.cursor()
