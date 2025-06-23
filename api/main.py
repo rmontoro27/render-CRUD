@@ -157,8 +157,8 @@ def crear_empleado(request: EmpleadoBase):
         empleado = AdminCRUD.crear_empleado(request)
 
         # Generar y enviar código solo si se creó bien
-        #codigo = generar_codigo_verificacion()
-        #enviar_codigo_verificacion(empleado['nombre'], empleado['correo_electronico'], codigo)
+        codigo = generar_codigo_verificacion()
+        enviar_codigo_verificacion(empleado['nombre'], empleado['correo_electronico'], codigo)
 
         return {
             "mensaje": "Empleado creado correctamente",
