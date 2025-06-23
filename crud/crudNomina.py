@@ -100,7 +100,7 @@ class NominaCRUD:
                     FROM concepto 
                     WHERE tipo_concepto = 'Deducción'
                 """)
-                descuentos = {desc: float(valor) * salario_base for desc, valor in cur.fetchall()}
+                descuentos = {desc: (float(valor) / 100) * salario_base for desc, valor in cur.fetchall()}
 
                 # Obtener bono presentismo si existe
                 cur.execute("""
