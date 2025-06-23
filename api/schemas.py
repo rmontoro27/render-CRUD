@@ -300,7 +300,7 @@ class CategoriaInput(BaseModel):
 class ConfigAsistenciaUpdate(BaseModel):
     valor: str 
     
-class InformacionLaboralCreate(BaseModel):
+class InformacionLaboral(BaseModel):
     id_empleado: int
     id_departamento: int
     id_puesto: int

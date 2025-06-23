@@ -28,7 +28,7 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
                       SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest,
                       JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest,PuestoInput, CategoriaInput,DepartamentoInput,
-                      ConfigAsistenciaUpdate, InformacionLaboralCreate)
+                      ConfigAsistenciaUpdate, InformacionLaboral)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -1067,7 +1067,7 @@ def obtener_localidades_por_provincia(codigo_provincia: int = None):
     
 ##Agregar informacion laboral a un empleado
 @app.post("/api/informacion-laboral/agregar")
-def agregar_informacion_laboral(request: InformacionLaboralCreate):
+def agregar_informacion_laboral(request: InformacionLaboral):
     try:
         AdminCRUD.agregar_informacion_laboral(
             id_empleado=request.id_empleado,
@@ -1109,5 +1109,26 @@ def obtener_info_laboral_completa(id_empleado: int):
                 "tipo_semana_laboral": info[10]
                 }       
         raise HTTPException(status_code=404, detail="No encontrado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.put("/api/informacion-laboral/modificar")
+def modificar_info_laboral(request: InformacionLaboral):
+    try:
+        AdminCRUD.modificar_informacion_laboral(
+            id_empleado=request.id_empleado,
+            id_departamento=request.id_departamento,
+            id_puesto=request.id_puesto,
+            id_categoria=request.id_categoria,
+            fecha_ingreso=request.fecha_ingreso,
+            turno=request.turno,
+            hora_inicio_turno=request.hora_inicio_turno,
+            hora_fin_turno=request.hora_fin_turno,
+            cantidad_horas_trabajo=request.cantidad_horas_trabajo,
+            tipo_contrato=request.tipo_contrato,
+            estado=request.estado,
+            tipo_semana_laboral=request.tipo_semana_laboral
+        )
+        return {"mensaje": "Información laboral actualizada correctamente"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -1920,3 +1920,73 @@ class AdminCRUD:
         finally:
             if conn:
                 db.return_connection(conn)
+
+@staticmethod
+def modificar_informacion_laboral(
+    id_empleado: int,
+    id_departamento: int,
+    id_puesto: int,
+    id_categoria: int,
+    fecha_ingreso: str,
+    turno: str,
+    hora_inicio_turno: str,
+    hora_fin_turno: str,
+    cantidad_horas_trabajo: int,
+    tipo_contrato: str,
+    estado: str,
+    tipo_semana_laboral: str
+):
+    try:
+        with db.get_connection() as conn:
+            cur = conn.cursor()
+
+            # Verificar que exista información laboral para este empleado
+            cur.execute("SELECT 1 FROM informacion_laboral WHERE id_empleado = %s", (id_empleado,))
+            if not cur.fetchone():
+                raise ValueError("No se encontró información laboral registrada para este empleado.")
+
+            # Actualizar la información laboral
+            cur.execute("""
+                UPDATE informacion_laboral
+                SET
+                    id_departamento = %s,
+                    id_puesto = %s,
+                    id_categoria = %s,
+                    fecha_ingreso = %s,
+                    turno = %s,
+                    hora_inicio_turno = %s,
+                    hora_fin_turno = %s,
+                    cantidad_horas_trabajo = %s,
+                    tipo_contrato = %s,
+                    estado = %s,
+                    tipo_semana_laboral = %s
+                WHERE id_empleado = %s
+            """, (
+                id_departamento,
+                id_puesto,
+                id_categoria,
+                fecha_ingreso,
+                turno,
+                hora_inicio_turno,
+                hora_fin_turno,
+                cantidad_horas_trabajo,
+                tipo_contrato,
+                estado,
+                tipo_semana_laboral,
+                id_empleado
+            ))
+
+            conn.commit()
+            return {"mensaje": "Información laboral actualizada correctamente"}
+
+    except Exception as e:
+        if 'conn' in locals():
+            conn.rollback()
+        print("❌ Error al modificar información laboral:", e)
+        raise e
+
+    finally:
+        if 'cur' in locals():
+            cur.close()
+        if 'conn' in locals():
+            conn.close()
