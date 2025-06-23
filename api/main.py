@@ -1089,3 +1089,25 @@ def agregar_informacion_laboral(request: InformacionLaboralCreate):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+
+@app.get("/empleados/{empleado_id}/informacion-laboral-completa")
+def obtener_info_laboral_completa(empleado_id: int):
+    try:
+        info = AdminCRUD.buscar_informacion_laboral_completa_por_id_empleado(empleado_id)
+        if info:
+            return {
+                "id_departamento": info[1],
+                "id_puesto": info[2],
+                "id_categoria": info[3],
+                "fecha_ingreso": info[4].strftime('%Y-%m-%d'),
+                "turno": info[5],
+                "hora_inicio_turno": str(info[6]),
+                "hora_fin_turno": str(info[7]),
+                "cantidad_horas_trabajo": info[8],
+                "tipo_contrato": info[9],
+                "estado": info[10],
+                "tipo_semana_laboral": info[11]
+            }
+        raise HTTPException(status_code=404, detail="No encontrado")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

@@ -1887,3 +1887,48 @@ class AdminCRUD:
                 cur.close()
             if 'conn' in locals():
                 conn.close()
+
+    @staticmethod
+    def buscar_informacion_laboral_completa_por_id_empleado(id_empleado: int):
+        """
+        Busca la información laboral completa de un empleado por su ID.
+
+        Args:
+            id_empleado: ID del empleado a buscar
+
+        Returns:
+            Tupla con todos los campos necesarios o None si no se encuentra.
+            (id_empleado, id_departamento, id_puesto, id_categoria, fecha_ingreso,
+            turno, hora_inicio_turno, hora_fin_turno, cantidad_horas_trabajo,
+            tipo_contrato, estado, tipo_semana_laboral)
+        """
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            query = """
+                SELECT 
+                    il.id_departamento,
+                    il.id_puesto,
+                    il.id_categoria,
+                    il.fecha_ingreso,
+                    il.turno,
+                    il.hora_inicio_turno,
+                    il.hora_fin_turno,
+                    il.cantidad_horas_trabajo,
+                    il.tipo_contrato,
+                    il.estado,
+                    il.tipo_semana_laboral
+                FROM informacion_laboral il
+                WHERE il.id_empleado = %s
+                ORDER BY il.fecha_ingreso DESC
+                LIMIT 1
+            """
+            cur.execute(query, (id_empleado,))
+            return cur.fetchone()
+
+        except Exception as e:
+            print(f"Error al buscar información laboral completa: {str(e)}")
+            raise ValueError(f"No se pudo obtener la información laboral completa: {str(e)}")
+        finally:
+            if conn:
+                db.return_connection(conn)
