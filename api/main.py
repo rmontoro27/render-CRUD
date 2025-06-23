@@ -1090,10 +1090,10 @@ def agregar_informacion_laboral(request: InformacionLaboralCreate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
 
-@app.get("/empleados/{empleado_id}/informacion-laboral-completa")
-def obtener_info_laboral_completa(empleado_id: int):
+@app.get("/empleados/{id_empleado}/informacion-laboral-completa")
+def obtener_info_laboral_completa(id_empleado: int):
     try:
-        info = AdminCRUD.buscar_informacion_laboral_completa_por_id_empleado(empleado_id)
+        info = AdminCRUD.buscar_informacion_laboral_completa_por_id_empleado(id_empleado)
         if info:
             return {
                 "id_departamento": info[1],
