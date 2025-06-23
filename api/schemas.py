@@ -305,10 +305,10 @@ class InformacionLaboral(BaseModel):
     id_departamento: int
     id_puesto: int
     id_categoria: int
-    fecha_ingreso: str
+    fecha_ingreso: date            
     turno: str
-    hora_inicio_turno: str
-    hora_fin_turno: str
+    hora_inicio_turno: time        
+    hora_fin_turno: time           
     cantidad_horas_trabajo: int
     tipo_contrato: str
     estado: str
