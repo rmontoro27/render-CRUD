@@ -60,7 +60,7 @@ class NominaCRUD:
                     raise ValueError("Salario base no encontrado")
                 salario_base = float(salario_base_row[0])
 
-                if tipo.lower() in ["Primera quincena", "Segunda quincena"]:
+                if tipo.lower() in ["primera quincena", "segunda quincena"]:
                     salario_base = salario_base / 2
                 # Obtener horas normales trabajadas
                 cur.execute("""
