@@ -150,7 +150,6 @@ def crear_empleado(empleado: EmpleadoBase):
         raise HTTPException(status_code=400, detail=str(e))
 """
 
-
 @app.post("/crear-empleado/")
 def crear_empleado(request: EmpleadoBase):
     try:
