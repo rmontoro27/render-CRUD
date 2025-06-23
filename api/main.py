@@ -1010,10 +1010,10 @@ def obtener_configuracion_asistencia():
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error al obtener las configuraciones")
 
-@app.put("/api/configuracion-asistencia/")
-def actualizar_configuracion_asistencia(datos: ConfigAsistenciaUpdate):
+@app.put("/api/configuracion-asistencia/{clave}")
+def actualizar_configuracion_asistencia(clave:str, datos: ConfigAsistenciaUpdate):
     try:
-        return AdminCRUD.actualizar_configuracion_asistencia(datos.valor)
+        return AdminCRUD.actualizar_configuracion_asistencia(clave,datos.valor)
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception:
