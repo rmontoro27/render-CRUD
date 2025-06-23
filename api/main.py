@@ -1018,3 +1018,32 @@ def actualizar_configuracion_asistencia(clave:str, datos: ConfigAsistenciaUpdate
         raise HTTPException(status_code=404, detail=str(ve))
     except Exception:
         raise HTTPException(status_code=500, detail="Error al actualizar la configuración")
+    
+#LISTADO DE PAISES, PROVINCIAS Y LOCALIDADES
+@app.get("/api/paises/")
+def listar_paises():
+    try:
+        return AdminCRUD.listar_paises()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al listar países")
+
+@app.get("/api/provincias/")
+def listar_provincias():
+    try:
+        return AdminCRUD.listar_provincias()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al listar provincias")
+
+@app.get("/api/localidades/")
+def listar_localidades():
+    try:
+        return AdminCRUD.listar_localidades()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al listar localidades")
+
+@app.get("/api/partidos/")
+def obtener_partidos():
+    try:
+        return AdminCRUD.listar_partidos()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error al obtener partidos")

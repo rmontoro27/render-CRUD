@@ -1686,3 +1686,74 @@ class AdminCRUD:
                 cur.close()
             if conn:
                 conn.close()
+
+#Localidades, partidos, paises y provincias
+    @staticmethod
+    def listar_paises():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT codigo_pais, nombre FROM pais ORDER BY nombre ASC")
+            rows = cur.fetchall()
+            return [{"codigo_pais": row[0], "nombre": row[1]} for row in rows]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def listar_provincias():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT codigo_provincia, nombre FROM provincia ORDER BY nombre ASC")
+            rows = cur.fetchall()
+            return [{"codigo_provincia": row[0], "nombre": row[1]} for row in rows]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+
+    @staticmethod
+    def listar_localidades():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT codigo_localidad, codigo_provincia, nombre FROM localidad ORDER BY nombre ASC")
+            rows = cur.fetchall()
+            return [
+                {"codigo_localidad": row[0], "codigo_provincia": row[1], "nombre": row[2]}
+                for row in rows
+            ]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
+                
+    @staticmethod
+    def listar_partidos():
+        conn = None
+        cur = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT codigo_partido, codigo_provincia, nombre FROM partido ORDER BY nombre ASC")
+            rows = cur.fetchall()
+            return [
+                {"codigo_partido": row[0], "codigo_provincia": row[1], "nombre": row[2]}
+                for row in rows
+            ]
+        finally:
+            if cur:
+                cur.close()
+            if conn:
+                conn.close()
