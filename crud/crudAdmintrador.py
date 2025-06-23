@@ -1591,16 +1591,16 @@ class AdminCRUD:
    # ----------- CATEGORIA -----------
 
     @staticmethod
-    def agregar_categoria(nombre: str):
+    def agregar_categoria(nombre_categoria: str):
         conn = None
         cur = None
         try:
             conn = db.get_connection()
             cur = conn.cursor()
-            cur.execute("SELECT 1 FROM categoria WHERE nombre_categoria = %s", (nombre,))
+            cur.execute("SELECT 1 FROM categoria WHERE nombre_categoria = %s", (nombre_categoria,))
             if cur.fetchone():
                 raise ValueError("Ya existe una categoría con ese nombre.")
-            cur.execute("INSERT INTO categoria (nombre_categoria) VALUES (%s)", (nombre,))
+            cur.execute("INSERT INTO categoria (nombre_categoria) VALUES (%s)", (nombre_categoria,))
             conn.commit()
         except Exception as e:
             if conn:
@@ -1621,7 +1621,7 @@ class AdminCRUD:
             cur = conn.cursor()
             cur.execute("SELECT id_categoria, nombre_categoria FROM categoria ORDER BY id_categoria ASC")
             rows = cur.fetchall()
-            return [{"id": row[0], "nombre": row[1]} for row in rows]
+            return [{"id_categoria": row[0], "nombre_categoria": row[1]} for row in rows]
         finally:
             if cur:
                 cur.close()
