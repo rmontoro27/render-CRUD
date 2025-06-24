@@ -146,15 +146,8 @@ class NominaCRUD:
                 )
 
                 id_nomina = cur.fetchone()[0]
-                conn.commit()
 
-                # Devolver nomina completa
-                cur.execute("SELECT * FROM nomina WHERE id_nomina = %s", (id_nomina,))
-                row = cur.fetchone()
-                columns = [desc[0] for desc in cur.description]
-                nomina_dict = dict(zip(columns, row))
-
-                #Guardamos en logs
+                # Guardamos en logs
                 cur.execute(
                     """
                     INSERT INTO log_nomina (id_nomina, id_usuario, accion, detalle)
@@ -163,6 +156,16 @@ class NominaCRUD:
                     (id_nomina, id_usuario, 'CREACIÓN',
                      f'Nómina generada para el periodo {periodo_texto} - tipo {tipo}')
                 )
+
+                conn.commit()
+
+                # Devolver nomina completa
+                cur.execute("SELECT * FROM nomina WHERE id_nomina = %s", (id_nomina,))
+                row = cur.fetchone()
+                columns = [desc[0] for desc in cur.description]
+                nomina_dict = dict(zip(columns, row))
+
+
 
                 # Agregar campo periodo
                 cur.execute("""
