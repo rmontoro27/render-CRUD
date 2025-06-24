@@ -614,6 +614,13 @@ def descargar_recibo(id_nomina: int):
         media_type='application/pdf',
         filename=f"recibo_{id_nomina}.pdf"
     )
+@app.get("/periodos-unicos/")
+def listar_periodos_unicos():
+    try:
+        periodos = AdminCRUD.obtener_periodos_unicos()
+        return {"periodos": periodos}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 #user--------------------------------------------------------------
 
@@ -1147,3 +1154,27 @@ def habilitar_cuenta(id_empleado: int):
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno al habilitar la cuenta")
 
+@staticmethod
+def obtener_periodos_unicos():
+    conn = None
+    try:
+        conn = db.get_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            SELECT DISTINCT periodo_texto
+            FROM periodo_empleado
+            ORDER BY periodo_texto
+        """)
+        periodos = [row[0] for row in cur.fetchall()]
+        return periodos
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print(f"[ERROR] Error al obtener periodos únicos: {e}")
+        raise ValueError("No se pudieron obtener los periodos")
+
+    finally:
+        if conn:
+            conn.close()
