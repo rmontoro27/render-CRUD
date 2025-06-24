@@ -208,13 +208,28 @@ class Permisos(BaseModel):
 class ReciboResponse(BaseModel):
     id_nomina: int
     nombre: str
+    apellido: str
+    tipo_identificacion: str
+    numero_identificacion: str
+    puesto: str
+    categoria: str
+    departamento: str
+    tipo: str
     periodo: str
     fecha_de_pago: date
+    banco: str
+    numero_cuenta: str
     salario_base: float
     bono_presentismo: float
+    bono_antiguedad: float
     horas_extra: float
     descuento_jubilacion: float
     descuento_obra_social: float
+    descuento_anssal: float
+    descuento_ley_19032: float
+    impuesto_ganancias: float
+    descuento_sindical: float
+    sueldo_bruto: float
     sueldo_neto: float
 
 class CuentaBancariaInput(BaseModel):
