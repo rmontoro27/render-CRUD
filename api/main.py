@@ -1155,12 +1155,9 @@ def habilitar_cuenta(id_empleado: int):
     except Exception:
         raise HTTPException(status_code=500, detail="Error interno al habilitar la cuenta")
 
-@app.get("/periodos-unicos/", response_model=list[str])
+@app.get("/api/periodos-unicos/")
 def listar_periodos_unicos():
     try:
-        periodos = AdminCRUD.obtener_periodos_unicos()
-        return periodos
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+        return AdminCRUD.obtener_periodos_unicos()
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error al obtener los periodos únicos")

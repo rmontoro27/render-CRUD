@@ -2034,24 +2034,19 @@ class AdminCRUD:
     @staticmethod
     def obtener_periodos_unicos():
         conn = None
+        cur = None
         try:
             conn = db.get_connection()
             cur = conn.cursor()
-
             cur.execute("""
                 SELECT DISTINCT periodo_texto
                 FROM periodo_empleado
                 ORDER BY periodo_texto
             """)
-            periodos = [row[0] for row in cur.fetchall()]
-            return periodos
-
-        except Exception as e:
-            if conn:
-                conn.rollback()
-            print(f"[ERROR] Error al obtener periodos únicos: {e}")
-            raise ValueError("No se pudieron obtener los periodos")
-
+            rows = cur.fetchall()
+            return [row[0] for row in rows]
         finally:
+            if cur:
+                cur.close()
             if conn:
                 conn.close()
