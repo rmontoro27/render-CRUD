@@ -13,7 +13,7 @@ class NominaCRUD:
         self.db = db
 
     @staticmethod
-    def calcular_nomina(id_empleado: int, periodo_texto: str, fecha_calculo: str, tipo: str):
+    def calcular_nomina(id_usuario: int, id_empleado: int, periodo_texto: str, fecha_calculo: str, tipo: str):
         with db.get_connection() as conn:
             try:
                 conn = db.get_connection()
@@ -153,6 +153,16 @@ class NominaCRUD:
                 row = cur.fetchone()
                 columns = [desc[0] for desc in cur.description]
                 nomina_dict = dict(zip(columns, row))
+
+                #Guardamos en logs
+                cur.execute(
+                    """
+                    INSERT INTO log_nomina (id_nomina, id_usuario, accion, detalle)
+                    VALUES (%s, %s, %s, %s)
+                    """,
+                    (id_nomina, id_usuario, 'CREACIÓN',
+                     f'Nómina generada para el periodo {periodo_texto} - tipo {tipo}')
+                )
 
                 # Agregar campo periodo
                 cur.execute("""
