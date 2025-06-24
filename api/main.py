@@ -1132,3 +1132,14 @@ def modificar_info_laboral(request: InformacionLaboral):
         return {"mensaje": "Información laboral actualizada correctamente"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.put("/api/habilitar-cuenta")
+def habilitar_cuenta(id_empleado: int):
+    try:
+        AdminCRUD.habilitar_cuenta(id_empleado)
+        return {"mensaje": f"Cuenta del empleado {id_empleado} habilitada correctamente"}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="Error interno al habilitar la cuenta")
+

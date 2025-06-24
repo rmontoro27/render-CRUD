@@ -165,6 +165,27 @@ class AdminCRUD:
                 db.return_connection(conn)
 
     @staticmethod
+    def habilitar_cuenta(id_empleado: int):
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                """
+                UPDATE usuario
+                SET esta_activo = TRUE,
+                    fecha_activacion = %s
+                WHERE id_empleado = %s
+                """,
+                (date.today(), id_empleado)
+            )
+            if cur.rowcount == 0:
+                raise ValueError("No se encontró el usuario con ese ID de empleado")
+            conn.commit()
+        finally:
+            if conn:
+                db.return_connection(conn)
+
+    @staticmethod
     def obtener_empleado():
         """Lista todos los empleados con información básica"""
         try:
