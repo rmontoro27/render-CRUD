@@ -216,7 +216,7 @@ class NominaCRUD:
                 db.return_connection(conn)
 
     @staticmethod
-    def obtener_nominas_empleado(id_empleado: int) -> List[NominaResponse]:
+    def obtener_nominas_empleado(id_empleado: int) -> List[ReciboResponse]:
         """Devuelve todas las nóminas del empleado como Pydantic models"""
         conn = None
         try:
@@ -230,7 +230,7 @@ class NominaCRUD:
                 """, (id_empleado,))
 
             columns = [desc[0] for desc in cur.description]
-            return [NominaResponse(**dict(zip(columns, row))) for row in cur.fetchall()]
+            return [ReciboResponse(**dict(zip(columns, row))) for row in cur.fetchall()]
 
         finally:
             if conn:
