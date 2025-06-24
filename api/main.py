@@ -162,7 +162,8 @@ def crear_empleado(request: EmpleadoBase):
 
         return {
             "mensaje": "Empleado creado correctamente",
-            "id_empleado": empleado
+            "id_empleado": empleado,
+            "codigo": codigo
         }
 
     except ValueError as e:
