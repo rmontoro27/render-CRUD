@@ -39,6 +39,7 @@ class EmpleadoBase(BaseModel):
         genero: str
         pais_nacimiento: str
         estado_civil: str
+        id_usuario: str
 
 class EmpleadoUpdate(BaseModel):
         telefono: Optional[str] = None

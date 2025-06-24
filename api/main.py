@@ -413,6 +413,7 @@ async def actualizar_registro_horario(
 @app.patch("/empleados/{empleado_id}/datos-personales", response_model=EmpleadoBase)
 async def actualizar_datos_personales(
         empleado_id: int,
+        id_usuario: int,
         datos: EmpleadoUpdate
 ):
     """
@@ -431,6 +432,7 @@ async def actualizar_datos_personales(
         # Llamada a tu función CRUD existente
         empleado_actualizado = AdminCRUD.actualizar_datos_personales2(
             id_empleado=empleado_id,
+            id_usuario=id_usuario,
             **campos_actualizar
         )
 

@@ -15,7 +15,7 @@ from crud import validacion_entrada
 class AdminCRUD:
 
     @staticmethod
-    def crear_empleado(nuevo_empleado):
+    def crear_empleado(id_usuario: int,nuevo_empleado):
         conn = None
         try:
             conn = db.get_connection()
@@ -53,6 +53,15 @@ class AdminCRUD:
             )
 
             resultado = cur.fetchone()
+
+            # Registrar evento en evento_sistema
+            cur.execute(
+                """
+                INSERT INTO evento_sistema (id_usuario, tipo_evento, descripcion)
+                VALUES (%s, %s, %s)
+                """,
+                (id_usuario, 'Otro', f'Se creó el empleado {resultado[1]} {resultado[2]} (ID: {resultado[0]})')
+            )
             conn.commit()
 
             return {
@@ -685,7 +694,7 @@ class AdminCRUD:
 
 
     @staticmethod
-    def actualizar_datos_personales2(id_empleado: int, telefono: str = None,
+    def actualizar_datos_personales2(id_usuario:int, id_empleado: int, telefono: str = None,
                                     correo_electronico: str = None, calle: str = None,
                                     numero_calle: str = None, localidad: str = None,
                                     partido: str = None, provincia: str = None):
@@ -779,6 +788,16 @@ class AdminCRUD:
             if cur.rowcount == 0:
                 raise ValueError("No se encontró el empleado con el ID proporcionado")
             print(f"[DEBUG] Tipo de conn: {type(conn)}")
+
+            # Registrar evento en la tabla evento_sistema
+            cur.execute("""
+                INSERT INTO evento_sistema (id_usuario, tipo_evento, descripcion)
+                VALUES (%s, %s, %s)
+            """, (
+                id_usuario,
+                'Otro',
+                f'Datos personales actualizados para empleado ID {id_empleado}'
+            ))
             conn.commit()
             return Empleado.obtener_por_id(id_empleado)
         finally:
