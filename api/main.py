@@ -27,8 +27,9 @@ from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResp
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
                       LoginRequest, RegistroUpdate, CrearUsuarioRequest, CuentaBancariaInput, CuentaBancariaModificar,
                       SalarioInput, ConceptoInput, ConceptoOutput, ConceptoUpdate, JornadaRequest,
-                      JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest,PuestoInput, CategoriaInput,DepartamentoInput,
-                      ConfigAsistenciaUpdate, InformacionLaboral)
+                      JornadaParcialRequest, IncidenciaAsistenciaRequest, AsistenciaBiometricaRequest, PuestoInput,
+                      CategoriaInput, DepartamentoInput,
+                      ConfigAsistenciaUpdate, InformacionLaboral, ReciboResponse)
 from fastapi import APIRouter, HTTPException
 from crud.database import db
 from fastapi.middleware.cors import CORSMiddleware
@@ -482,7 +483,7 @@ async def cargar_imagen(image: UploadFile = File(...), usuario_id: int = Form(..
 #NOMINAS----------------------------------------------------------------------------------------
 
 # Obtener última nómina de un empleado (GET)
-@app.get("/nominas/empleado/{id_empleado}/ultima", response_model=NominaResponse)
+@app.get("/nominas/empleado/{id_empleado}/ultima", response_model=ReciboResponse)
 async def obtener_ultima_nomina_empleado(id_empleado: int):
     try:
         nominas = NominaCRUD.obtener_nominas_empleado(id_empleado)
@@ -528,7 +529,7 @@ async def buscar_nominas_empleado(
 
 
 # Obtener nómina específica por ID (GET)
-@app.get("/nominas/{id_nomina}", response_model=NominaResponse)
+@app.get("/nominas/{id_nomina}", response_model=ReciboResponse)
 async def obtener_nomina(id_nomina: int):
     try:
         nomina = NominaCRUD.obtener_nomina(id_nomina)
