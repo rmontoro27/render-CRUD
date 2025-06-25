@@ -39,7 +39,7 @@ import cloudinary.uploader
 from fastapi import UploadFile, File, Form
 from fastapi.responses import FileResponse
 import traceback
-from utils.correos import generar_codigo_verificacion, enviar_codigo_verificacion
+from utils.correos import generar_codigo_verificacion, enviar_codigo_verificacion, enviar_correo_manual
 from weasyprint import HTML
 from jinja2 import Environment, FileSystemLoader
 import psycopg2
@@ -1278,3 +1278,18 @@ def listar_periodos_unicos():
         return AdminCRUD.obtener_periodos_unicos()
     except Exception:
         raise HTTPException(status_code=500, detail="Error al obtener los periodos únicos")
+
+
+class CorreoManual(BaseModel):
+    correo: str
+    asunto: str
+    mensaje: str
+
+@app.post("/api/enviar-correo-manual/")
+def enviar_correo_manual_endpoint(data: CorreoManual):
+    try:
+        enviar_correo_manual(data.correo, data.asunto, data.mensaje)
+        return {"detalle": "Correo enviado correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al enviar el correo: {e}")
+

@@ -1,4 +1,3 @@
-import os
 import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
@@ -81,3 +80,19 @@ def enviar_codigo_verificacion(nombre, correo, codigo):
         server.starttls()
         server.login(EMAIL_ORIGEN, EMAIL_PASSWORD)
         server.send_message(msg)
+
+
+def enviar_correo_manual(correo, asunto, mensaje):
+    msg = MIMEText(mensaje)
+    msg['Subject'] = asunto
+    msg['From'] = EMAIL_ORIGEN
+    msg['To'] = correo
+
+    try:
+        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.starttls()
+            server.login(EMAIL_ORIGEN, EMAIL_PASSWORD)
+            server.send_message(msg)
+        print(f"Correo enviado exitosamente a {correo}")
+    except Exception as e:
+        print(f"Error al enviar correo: {e}")
