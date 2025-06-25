@@ -5,7 +5,7 @@ from pydantic import field_validator
 #import face_recognition
 import numpy as np
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Response
 
 from auth.jwt import crear_token
 from crud import crudEmpleado, crudAdmintrador
@@ -40,6 +40,11 @@ from fastapi import UploadFile, File, Form
 from fastapi.responses import FileResponse
 import traceback
 from utils.correos import generar_codigo_verificacion, enviar_codigo_verificacion
+from weasyprint import HTML
+from jinja2 import Environment, FileSystemLoader
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from num2words import num2words
 
 
 
@@ -618,6 +623,110 @@ def descargar_recibo(id_nomina: int):
         media_type='application/pdf',
         filename=f"recibo_{id_nomina}.pdf"
     )
+
+# Configurar motor de plantillas
+TEMPLATE_DIR = os.path.join(os.getcwd(), "utils")
+env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+
+@app.get("/empleados/{id_empleado}/recibos/{id_nomina}/descargar")
+def generar_recibo_pdf(id_empleado: int, id_nomina: int):
+    conn = None
+    try:
+        conn = db.get_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+
+        # 1. Obtener datos del recibo desde la vista
+        cur.execute("""
+            SELECT * FROM recibo_sueldo
+            WHERE id_empleado = %s AND id_nomina = %s
+        """, (id_empleado, id_nomina))
+        row = cur.fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Recibo no encontrado")
+
+        # 2. Fecha de ingreso
+        cur.execute("""
+            SELECT fecha_ingreso
+            FROM informacion_laboral
+            WHERE id_empleado = %s
+        """, (id_empleado,))
+        ingreso = cur.fetchone()
+        fecha_ingreso = ingreso["fecha_ingreso"] if ingreso else "No disponible"
+
+        # 3. Conceptos base
+        cur.execute("""
+            SELECT codigo, descripcion, tipo_concepto, valor_por_defecto
+            FROM concepto
+        """)
+        conceptos_base = cur.fetchall()
+
+        salario_base = float(row["salario_base"])
+        conceptos = []
+        total_deducciones = 0
+        total_haberes = salario_base
+
+        for concepto in conceptos_base:
+            porcentaje = float(concepto["valor_por_defecto"])
+            monto = round(salario_base * porcentaje / 100, 2)
+            conceptos.append({
+                "codigo": concepto["codigo"],
+                "descripcion": concepto["descripcion"],
+                "cantidad": f"{porcentaje:.2f}%",
+                "haber": monto if concepto["tipo_concepto"] == "Remunerativo" else 0,
+                "deduccion": monto if concepto["tipo_concepto"] == "Deducción" else 0,
+            })
+            if concepto["tipo_concepto"] == "Deducción":
+                total_deducciones += monto
+
+        # 4. Conceptos adicionales
+        conceptos += [
+            {"codigo": "X01", "descripcion": "Bono Presentismo", "cantidad": "1", "haber": row["bono_presentismo"], "deduccion": 0},
+            {"codigo": "X02", "descripcion": "Bono Antigüedad", "cantidad": "1", "haber": row["bono_antiguedad"], "deduccion": 0},
+            {"codigo": "X03", "descripcion": "Horas Extra", "cantidad": "1", "haber": row["horas_extra"], "deduccion": 0},
+        ]
+        total_haberes += float(row["bono_presentismo"] or 0)
+        total_haberes += float(row["bono_antiguedad"] or 0)
+        total_haberes += float(row["horas_extra"] or 0)
+
+        sueldo_neto = total_haberes - total_deducciones
+
+        # 5. Renderizar HTML
+        template = env.get_template("recibo_template.html")
+        html_rendered = template.render(
+            id_empleado=row["id_empleado"],
+            nombre=row["nombre"],
+            apellido=row["apellido"],
+            tipo_identificacion=row["tipo_identificacion"],
+            numero_identificacion=row["numero_identificacion"],
+            puesto=row["puesto"],
+            categoria=row["categoria"],
+            departamento=row["departamento"],
+            fecha_ingreso=fecha_ingreso,
+            periodo=row["periodo"],
+            fecha_de_pago=row["fecha_de_pago"],
+            banco=row["banco"],
+            numero_cuenta=row["numero_cuenta"],
+            salario_base=salario_base,
+            sueldo_bruto=total_haberes,
+            total_deducciones=total_deducciones,
+            sueldo_neto=sueldo_neto,
+            sueldo_neto_texto=num2words(sueldo_neto, lang='es').capitalize(),
+            conceptos=conceptos
+        )
+
+        pdf = HTML(string=html_rendered, base_url=os.getcwd()).write_pdf()
+        return Response(content=pdf, media_type="application/pdf", headers={
+            "Content-Disposition": f"inline; filename=recibo_{id_nomina}.pdf"
+        })
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
+
+    finally:
+        if conn:
+            conn.close()
+
+
 @app.get("/periodos-unicos/")
 def listar_periodos_unicos():
     try:
