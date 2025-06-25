@@ -42,6 +42,7 @@ class EmpleadoBase(BaseModel):
         id_usuario: str
 
 class EmpleadoUpdate(BaseModel):
+        id_usuario: int
         telefono: Optional[str] = None
         correo_electronico: Optional[str] = None
         calle: Optional[str] = None

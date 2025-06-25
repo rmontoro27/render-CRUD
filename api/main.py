@@ -263,6 +263,7 @@ def actualizar_datos_empleado(
 ):
     try:
         empleado_actualizado = AdminCRUD.actualizar_datos_personales2(
+            id_usuario=datos.id_usuario,
             id_empleado=empleado_id,
             telefono=datos.telefono,
             correo_electronico=datos.correo_electronico,
