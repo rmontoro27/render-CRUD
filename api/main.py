@@ -154,8 +154,10 @@ def crear_empleado(empleado: EmpleadoBase):
 @app.post("/crear-empleado/")
 def crear_empleado(request: EmpleadoBase):
     try:
+        # Asegurate que el modelo `EmpleadoBase` tenga el campo `id_usuario`
+        id_usuario = request.id_usuario
 
-        empleado = AdminCRUD.crear_empleado(request)
+        empleado = AdminCRUD.crear_empleado(id_usuario=id_usuario, nuevo_empleado=request)
 
         # Generar y enviar código solo si se creó bien
         codigo = generar_codigo_verificacion()
