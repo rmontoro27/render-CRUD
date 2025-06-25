@@ -176,6 +176,7 @@ class LoginResponse(BaseModel):
     rol: str
     id_empleado: int
     numero_identificacion: str
+    id_usuario: int
 
 class RegistroUpdate(BaseModel):
     tipo: Optional[str] = None
