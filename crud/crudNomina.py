@@ -23,7 +23,7 @@ class NominaCRUD:
                     fecha_calculo_dt = datetime.strptime(fecha_calculo, '%Y-%m-%d').date()
                 else:
                     fecha_calculo_dt = fecha_calculo  # ya es date
-                fecha_de_pago = fecha_calculo_dt + timedelta(days=7)
+                fecha_de_pago = fecha_calculo_dt
 
                 # Obtener id_periodo y presentismo
                 cur.execute("""
