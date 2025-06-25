@@ -644,6 +644,9 @@ def login(request: LoginRequest):
     if id_rol is None:
         raise HTTPException(status_code=404, detail="Rol no asignado al empleado")
 
+    # Obtener el id_empleado
+    id_usuario = usuario.id_usuario
+
     #  Obtener permisos desde tabla rol
     permisos = Usuario.obtener_permisos_por_id_rol(id_rol)
     numero_identificacion = AdminCRUD.obtener_numero_identificacion(usuario.id_empleado)
@@ -653,7 +656,8 @@ def login(request: LoginRequest):
         "sub": usuario.nombre_usuario,
         "id_empleado": usuario.id_empleado,
         "id_rol": id_rol,
-        "permisos": permisos.model_dump()
+        "permisos": permisos.model_dump(),
+        "id_usuario": id_usuario
     }
 
     token = crear_token(token_data)
@@ -664,7 +668,8 @@ def login(request: LoginRequest):
         "permisos": permisos,
         "rol": str(usuario.id_rol),
         "id_empleado": usuario.id_empleado,
-        "numero_identificacion": numero_identificacion
+        "numero_identificacion": numero_identificacion,
+        "id_usuario": id_usuario
 
     }
 
