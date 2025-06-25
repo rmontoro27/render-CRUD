@@ -41,6 +41,24 @@ class EmpleadoBase(BaseModel):
         estado_civil: str
         id_usuario: str
 
+
+class EmpleadoBase2(BaseModel):
+    nombre: str
+    apellido: str
+    tipo_identificacion: str
+    numero_identificacion: str
+    fecha_nacimiento: str
+    correo_electronico: str
+    telefono: str
+    calle: str
+    numero_calle: str
+    localidad: str
+    partido: str
+    provincia: str
+    genero: str
+    pais_nacimiento: str
+    estado_civil: str
+
 class EmpleadoUpdate(BaseModel):
         id_usuario: int
         telefono: Optional[str] = None

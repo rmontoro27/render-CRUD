@@ -183,6 +183,81 @@ class AdminCRUD:
                 db.return_connection(conn)
 
     @staticmethod
+    def crear_empleado3(nuevo_empleado):
+        conn = None
+        try:
+            conn = db.get_connection()
+            cur = conn.cursor()
+
+            # 👇 Corregir la secuencia por si quedó desfasada
+            cur.execute("SELECT MAX(id_empleado) FROM empleado")
+            max_id = cur.fetchone()[0] or 0
+
+            cur.execute("SELECT pg_get_serial_sequence('empleado', 'id_empleado')")
+            seq_name = cur.fetchone()[0]
+
+            cur.execute("SELECT setval(%s, %s, true)", (seq_name, max_id))
+            # ☝️ Esto asegura que el próximo id_empleado sea válido
+
+            numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado, 'numero_calle') else None
+
+            validacion_entrada.validar_datos_empleado(nuevo_empleado)
+
+            cur.execute(
+                """
+                INSERT INTO empleado (
+                    nombre, apellido, tipo_identificacion, numero_identificacion,
+                    fecha_nacimiento, correo_electronico, telefono, calle,
+                    numero_calle, localidad, partido, provincia, genero, 
+                    pais_nacimiento, estado_civil
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id_empleado, nombre, apellido, numero_identificacion, 
+                          numero_calle, telefono, correo_electronico
+                """,
+                (
+                    nuevo_empleado.nombre, nuevo_empleado.apellido, nuevo_empleado.tipo_identificacion,
+                    nuevo_empleado.numero_identificacion, nuevo_empleado.fecha_nacimiento,
+                    nuevo_empleado.correo_electronico, nuevo_empleado.telefono, nuevo_empleado.calle,
+                    numero_calle, nuevo_empleado.localidad, nuevo_empleado.partido,
+                    nuevo_empleado.provincia, nuevo_empleado.genero, nuevo_empleado.pais_nacimiento,
+                    nuevo_empleado.estado_civil
+                )
+            )
+
+            resultado = cur.fetchone()
+            conn.commit()
+
+            return {
+                "id_empleado": resultado[0],
+                "nombre": resultado[1],
+                "apellido": resultado[2],
+                "tipo_identificacion": nuevo_empleado.tipo_identificacion,
+                "numero_identificacion": resultado[3],
+                "fecha_nacimiento": nuevo_empleado.fecha_nacimiento,
+                "correo_electronico": resultado[6],
+                "telefono": resultado[5],
+                "calle": nuevo_empleado.calle,
+                "numero_calle": resultado[4],
+                "localidad": nuevo_empleado.localidad,
+                "partido": nuevo_empleado.partido,
+                "provincia": nuevo_empleado.provincia,
+                "genero": nuevo_empleado.genero,
+                "pais_nacimiento": nuevo_empleado.pais_nacimiento,
+                "estado_civil": nuevo_empleado.estado_civil
+            }
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            print(f"[ERROR] Error al crear empleado: {e}")
+            raise
+
+        finally:
+            if conn:
+                conn.close()
+
+    @staticmethod
     def habilitar_cuenta(id_empleado: int):
         try:
             conn = db.get_connection()

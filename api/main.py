@@ -21,7 +21,7 @@ from crud.crudUsuario import Usuario
 from pydantic import BaseModel, Field
 from typing import List
 from typing import Tuple, List
-from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoUpdate, NominaResponse,
+from .schemas import (EmpleadoResponse, EmpleadoBase, EmpleadoBase2, EmpleadoUpdate, NominaResponse,
                       NominaBase, NominaListResponse, EmpleadoNominaRequest, EmpleadoConsulta,
                       EmpleadoIDRequest, EmpleadoPeriodoRequest, EmpleadoIDIntRequest,
                       BuscarEmpleadoRequest, HorasRequest, CalculoNominaRequest, LoginResponse, LoginResponse,
@@ -181,6 +181,31 @@ def crear_empleado(request: EmpleadoBase):
         import traceback
         print("[ERROR] Error inesperado:\n", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+@app.post("/crear-empleado2/")
+def crear_empleado2(request: EmpleadoBase2):
+    try:
+
+        empleado = AdminCRUD.crear_empleado3(nuevo_empleado=request)
+
+        # Generar y enviar código solo si se creó bien
+        codigo = generar_codigo_verificacion()
+        enviar_codigo_verificacion(empleado['nombre'], empleado['correo_electronico'], codigo)
+
+        return {
+            "mensaje": "Empleado creado correctamente",
+            "id_empleado": empleado,
+            "codigo": codigo
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    except Exception as e:
+        import traceback
+        print("[ERROR] Error inesperado:\n", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
+
 
 
 @app.get("/empleados/{numero_identificacion}")
