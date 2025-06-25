@@ -692,6 +692,8 @@ def generar_recibo_pdf(id_empleado: int, id_nomina: int):
 
         # 5. Renderizar HTML
         template = env.get_template("recibo_template.html")
+        firma_path = os.path.abspath("utils/firma.png")
+        logo_path = os.path.abspath("utils/Logo_Empresa.png")
         html_rendered = template.render(
             id_empleado=row["id_empleado"],
             nombre=row["nombre"],
@@ -711,7 +713,9 @@ def generar_recibo_pdf(id_empleado: int, id_nomina: int):
             total_deducciones=total_deducciones,
             sueldo_neto=sueldo_neto,
             sueldo_neto_texto=num2words(sueldo_neto, lang='es').capitalize(),
-            conceptos=conceptos
+            conceptos=conceptos,
+            firma_path=firma_path,
+            logo_path=logo_path
         )
 
         pdf = HTML(string=html_rendered, base_url=os.getcwd()).write_pdf()
