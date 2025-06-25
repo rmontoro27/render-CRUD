@@ -945,8 +945,8 @@ async def subir_documento(
         raise HTTPException(status_code=500, detail="Error al subir el título")
 
 
-@app.get("/api/documentos/cv/{empleado_id}")
-def obtener_documento(empleado_id: int, tipo: str):
+@app.get("/api/documentos/{tipo}/{empleado_id}")
+def obtener_documento(tipo: str, empleado_id: int):
     try:
         return AdminCRUD.obtener_documento_tipo(empleado_id, tipo)
     except ValueError as ve:
