@@ -11,6 +11,7 @@ import cloudinary.uploader
 from cloudinary.uploader import upload as cloudinary_upload
 import io
 from crud import validacion_entrada
+from auth.utils import registrar_evento_sistema
 
 class AdminCRUD:
 
@@ -86,12 +87,20 @@ class AdminCRUD:
         except Exception as e:
             if conn:
                 conn.rollback()
+                try:
+                    registrar_evento_sistema(
+                        conn,
+                        id_usuario=id_usuario,
+                        tipo_evento="Otro",
+                        descripcion=f"Error al crear empleado: {str(e)}"
+                    )
+                    conn.commit()
+                except Exception as log_error:
+                    print(f"[ERROR] Fallo al registrar log: {log_error}")
             print(f"[ERROR] Error al crear empleado: {e}")
             raise
 
         finally:
-            if cur:
-                cur.close()
             if conn:
                 conn.close()
 
