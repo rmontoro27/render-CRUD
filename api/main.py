@@ -45,7 +45,7 @@ from jinja2 import Environment, FileSystemLoader
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from num2words import num2words
-
+import json
 
 
 
@@ -199,6 +199,7 @@ def crear_empleado2(request: EmpleadoBase2):
         }
 
     except ValueError as e:
+        errores = json.loads(str(e))  # Intentar decodificar lista
         raise HTTPException(status_code=400, detail=str(e))
 
     except Exception as e:
