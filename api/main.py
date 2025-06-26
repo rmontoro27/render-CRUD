@@ -202,10 +202,14 @@ def crear_empleado2(request: EmpleadoBase2):
         errores = json.loads(str(e))  # Intentar decodificar lista
         raise HTTPException(status_code=400, detail=str(e))
 
+
     except Exception as e:
+
         import traceback
+
         print("[ERROR] Error inesperado:\n", traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Error interno del servidor")
+
+        raise HTTPException(status_code=500, detail=str(e))  # 👈 Mostrar el error real
 
 
 
