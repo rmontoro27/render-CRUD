@@ -125,6 +125,7 @@ class AdminCRUD:
             # Conversión de campos
             numero_calle = str(nuevo_empleado.numero_calle) if hasattr(nuevo_empleado,
                                                                        'numero_calle') and nuevo_empleado.numero_calle is not None else None
+            validacion_entrada.validar_datos_empleado(nuevo_empleado)
             # Calcular manualmente el próximo id_usuario
             cur.execute("SELECT MAX(id_usuario) FROM usuario")
             max_id = cur.fetchone()[0]
