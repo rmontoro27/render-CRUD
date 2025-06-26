@@ -199,8 +199,11 @@ def crear_empleado2(request: EmpleadoBase2):
         }
 
     except ValueError as e:
-        errores = json.loads(str(e))  # Intentar decodificar lista
-        raise HTTPException(status_code=400, detail=str(e))
+        try:
+            errores = json.loads(str(e))  # Intentar decodificar lista
+            raise HTTPException(status_code=400, detail=errores)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail=str(e))
 
 
     except Exception as e:
