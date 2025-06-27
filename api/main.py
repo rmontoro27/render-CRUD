@@ -596,7 +596,7 @@ async def calcular_nomina_endpoint(request: CalculoNominaRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.delete("/nominas/{id_nomina}")
-def eliminar_nomina(id_nomina: int):
+def eliminar_nomina(id_nomina: int, id_usuario: int):
     conn = None
     try:
         conn = db.get_connection()
@@ -607,11 +607,19 @@ def eliminar_nomina(id_nomina: int):
         if cur.fetchone() is None:
             raise HTTPException(status_code=404, detail="Nómina no encontrada")
 
-        # Eliminar registros relacionados si corresponde (por ejemplo, logs)
-        cur.execute("DELETE FROM log_nomina WHERE id_nomina = %s", (id_nomina,))
-
         # Eliminar la nómina
         cur.execute("DELETE FROM nomina WHERE id_nomina = %s", (id_nomina,))
+
+        # Registrar en log que se eliminó
+        cur.execute("""
+            INSERT INTO log_nomina (id_nomina, id_usuario, accion, detalle)
+            VALUES (%s, %s, %s, %s)
+        """, (
+            id_nomina,
+            id_usuario,
+            'ELIMINACIÓN',
+            f'Se eliminó la nómina ID {id_nomina}'
+        ))
         conn.commit()
 
         return {"mensaje": f"Nómina {id_nomina} eliminada correctamente"}
