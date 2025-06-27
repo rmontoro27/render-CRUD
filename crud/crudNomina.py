@@ -36,14 +36,33 @@ class NominaCRUD:
                     raise ValueError("Período no encontrado")
                 id_periodo, tiene_presentismo = row
 
-                # Validar que no exista una nómina para ese empleado, periodo y tipo
+                # Obtener tipos de nómina ya calculados para ese periodo
                 cur.execute("""
-                    SELECT COUNT(*) 
-                    FROM nomina 
-                    WHERE id_empleado = %s AND id_periodo = %s AND tipo = %s
-                """, (id_empleado, id_periodo, tipo))
-                if cur.fetchone()[0] > 0:
-                    raise ValueError("Ya existe una nómina para este empleado, periodo y tipo")
+                    SELECT tipo FROM nomina 
+                    WHERE id_empleado = %s AND id_periodo = %s
+                """, (id_empleado, id_periodo))
+                tipos_existentes = [row[0].lower() for row in cur.fetchall()]
+
+                tipo_actual = tipo.lower()
+
+                if tipo_actual == "mensual":
+                    if "mensual" in tipos_existentes:
+                        raise ValueError("Ya existe una nómina mensual para este período.")
+                    if "primera quincena" in tipos_existentes or "segunda quincena" in tipos_existentes:
+                        raise ValueError(
+                            "No se puede calcular una nómina mensual si ya existen quincenas para ese período.")
+                elif tipo_actual == "primera quincena":
+                    if "mensual" in tipos_existentes:
+                        raise ValueError("No se puede calcular la primera quincena si ya existe una nómina mensual.")
+                    if "primera quincena" in tipos_existentes:
+                        raise ValueError("Ya existe una nómina de primera quincena para este período.")
+                elif tipo_actual == "segunda quincena":
+                    if "mensual" in tipos_existentes:
+                        raise ValueError("No se puede calcular la segunda quincena si ya existe una nómina mensual.")
+                    if "primera quincena" not in tipos_existentes:
+                        raise ValueError("No se puede calcular la segunda quincena sin haber calculado la primera.")
+                    if "segunda quincena" in tipos_existentes:
+                        raise ValueError("Ya existe una nómina de segunda quincena para este período.")
 
                 # Obtener salario base
                 cur.execute("""
