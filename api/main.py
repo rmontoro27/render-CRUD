@@ -595,6 +595,36 @@ async def calcular_nomina_endpoint(request: CalculoNominaRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@app.delete("/nominas/{id_nomina}")
+def eliminar_nomina(id_nomina: int):
+    conn = None
+    try:
+        conn = db.get_connection()
+        cur = conn.cursor()
+
+        # Verificar si existe la nómina
+        cur.execute("SELECT 1 FROM nomina WHERE id_nomina = %s", (id_nomina,))
+        if cur.fetchone() is None:
+            raise HTTPException(status_code=404, detail="Nómina no encontrada")
+
+        # Eliminar registros relacionados si corresponde (por ejemplo, logs)
+        cur.execute("DELETE FROM log_nomina WHERE id_nomina = %s", (id_nomina,))
+
+        # Eliminar la nómina
+        cur.execute("DELETE FROM nomina WHERE id_nomina = %s", (id_nomina,))
+        conn.commit()
+
+        return {"mensaje": f"Nómina {id_nomina} eliminada correctamente"}
+
+    except psycopg2.Error as e:
+        if conn:
+            conn.rollback()
+        raise HTTPException(status_code=500, detail="Error de base de datos al eliminar la nómina")
+
+    finally:
+        if conn:
+            db.return_connection(conn)
+
 @app.get("/{empleado_id}/puesto")
 def obtener_puesto_empleado(empleado_id: int):
     try:
